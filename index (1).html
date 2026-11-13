@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cardiac Pathophysiology Study Guide</title>
+<style>
+:root{
+  --bg:#f7f4f1; --card:#ffffff; --ink:#1d1a1a; --muted:#6b6461; --line:#e6dfda;
+  --red:#b3261e; --red-soft:#fbe9e7; --navy:#1f3a5f; --navy-soft:#e8eef6;
+  --green:#1e7a46; --green-soft:#e5f4ea; --amber:#9a6200; --amber-soft:#fdf2dc;
+  --radius:14px; --shadow:0 1px 2px rgba(0,0,0,.05),0 4px 14px rgba(0,0,0,.05);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+header{background:var(--navy);color:#fff;padding:36px 20px 28px}
+header .wrap{max-width:1040px;margin:0 auto}
+header .kicker{font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.75;margin:0 0 6px}
+header h1{margin:0;font-size:clamp(26px,4.5vw,40px);line-height:1.15;font-weight:750}
+header h1 .pulse{color:#ff8a80}
+header p.sub{margin:10px 0 0;opacity:.85;font-size:15px}
+nav{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+nav .wrap{max-width:1040px;margin:0 auto;display:flex;gap:4px;overflow-x:auto;padding:8px 12px;scrollbar-width:none}
+nav .wrap::-webkit-scrollbar{display:none}
+nav button{flex:0 0 auto;border:0;background:transparent;font:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:9px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
+nav button:hover{background:var(--navy-soft);color:var(--navy)}
+nav button.active{background:var(--navy);color:#fff}
+main{max-width:1040px;margin:0 auto;padding:28px 16px 80px}
+section.panel{display:none}
+section.panel.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h2{font-size:26px;margin:0 0 6px;color:var(--navy)}
+.lead{color:var(--muted);margin:0 0 22px}
+/* ---------- Flashcards ---------- */
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:18px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 13px;font:inherit;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer}
+.chip.active{background:var(--red);border-color:var(--red);color:#fff}
+.chip.ghost{color:var(--navy)}
+.toolbar .spacer{flex:1}
+.toolbar input{border:1px solid var(--line);border-radius:999px;padding:8px 14px;font:inherit;font-size:14px;min-width:180px;background:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.flip{perspective:1000px;height:200px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.flip-inner{position:relative;width:100%;height:100%;transition:transform .5s cubic-bezier(.2,.7,.2,1);transform-style:preserve-3d}
+.flip.flipped .flip-inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.front{background:var(--card);border:1px solid var(--line);justify-content:center;align-items:center;text-align:center}
+.front .cat{position:absolute;top:12px;left:14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--red)}
+.front .term{font-size:19px;font-weight:700;color:var(--navy);line-height:1.25}
+.front .hint{position:absolute;bottom:12px;font-size:11px;color:var(--muted)}
+.back{background:var(--navy);color:#fff;transform:rotateY(180deg);overflow-y:auto;font-size:14px;line-height:1.5}
+.back .term{font-weight:700;font-size:13px;opacity:.75;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.counter{font-size:13px;color:var(--muted)}
+/* ---------- Essentials ---------- */
+.ess-nav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.ess-nav a{font-size:13px;font-weight:600;color:var(--navy);text-decoration:none;background:var(--navy-soft);padding:6px 11px;border-radius:999px}
+.block{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px 22px 18px;margin-bottom:18px;box-shadow:var(--shadow);scroll-margin-top:70px}
+.block h3{margin:0 0 12px;font-size:19px;color:var(--navy);display:flex;align-items:center;gap:10px}
+.block h3 .num{background:var(--red);color:#fff;font-size:13px;width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.block h4{margin:16px 0 6px;font-size:15px;color:var(--red)}
+.block ul{margin:6px 0 8px;padding-left:20px}
+.block li{margin:3px 0}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--navy-soft);color:var(--navy);font-weight:700}
+.tbl{overflow-x:auto}
+.formula{display:inline-block;background:var(--navy);color:#fff;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;padding:5px 10px;border-radius:8px;margin:3px 4px 3px 0}
+.pearl{background:var(--amber-soft);border-left:4px solid var(--amber);padding:10px 14px;border-radius:8px;margin:12px 0;font-size:14px}
+.pearl b{color:var(--amber)}
+.alert{background:var(--red-soft);border-left:4px solid var(--red);padding:10px 14px;border-radius:8px;margin:12px 0;font-size:14px}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0}
+.flow span{background:var(--navy-soft);color:var(--navy);padding:6px 10px;border-radius:8px;font-size:13px;font-weight:600}
+.flow i{font-style:normal;color:var(--red);font-weight:700}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:700px){.two{grid-template-columns:1fr}}
+details{border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:8px 0;background:#fcfbfa}
+details summary{cursor:pointer;font-weight:700;color:var(--navy)}
+details[open] summary{margin-bottom:8px}
+/* ---------- Tests ---------- */
+.scorebar{position:sticky;top:57px;z-index:10;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 16px;margin-bottom:18px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;box-shadow:var(--shadow)}
+.scorebar .stat{font-size:14px;color:var(--muted)}
+.scorebar .stat b{color:var(--ink);font-size:16px}
+.progress{flex:1;min-width:120px;height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.progress div{height:100%;background:var(--green);width:0;transition:width .3s}
+.btn{border:0;border-radius:10px;padding:9px 16px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.btn.primary{background:var(--navy);color:#fff}
+.btn.primary:disabled{background:#b8c2cf;cursor:not-allowed}
+.btn.subtle{background:var(--navy-soft);color:var(--navy)}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;font-size:12px}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:6px}
+.tag.C{background:#ede7f6;color:#5e35b1}
+.tag.J{background:var(--red-soft);color:var(--red)}
+.tag.A{background:var(--green-soft);color:var(--green)}
+.tag.S{background:var(--amber-soft);color:var(--amber)}
+.q{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;box-shadow:var(--shadow)}
+.q .meta{display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.q .qn{font-weight:800;color:var(--navy);margin-right:4px}
+.q .stem{font-size:16px;margin:0 0 12px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;margin:7px 0;cursor:pointer;transition:border-color .15s,background .15s;font-size:15px}
+.opt:hover{border-color:#b7c4d6}
+.opt input{margin-top:4px;accent-color:var(--navy);flex:0 0 auto}
+.opt.sel{border-color:var(--navy);background:var(--navy-soft)}
+.q.done .opt{cursor:default}
+.opt.correct{border-color:var(--green);background:var(--green-soft)}
+.opt.wrong{border-color:var(--red);background:var(--red-soft)}
+.opt.missed{border-color:var(--green);border-style:dashed}
+.opt .mark{margin-left:auto;font-weight:800;font-size:13px;white-space:nowrap}
+.opt.correct .mark{color:var(--green)}
+.opt.wrong .mark{color:var(--red)}
+.opt.missed .mark{color:var(--green)}
+.q .actions{margin-top:10px}
+.rationale{display:none;margin-top:12px;padding:12px 14px;border-radius:10px;font-size:14px}
+.q.done .rationale{display:block}
+.q.right .rationale{background:var(--green-soft);border-left:4px solid var(--green)}
+.q.miss .rationale{background:var(--red-soft);border-left:4px solid var(--red)}
+.rationale strong{display:block;margin-bottom:3px}
+.result{display:none;background:var(--navy);color:#fff;border-radius:var(--radius);padding:24px;margin-top:20px;text-align:center}
+.result.show{display:block}
+.result .big{font-size:44px;font-weight:800;line-height:1}
+.result .breakdown{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin:14px 0;font-size:14px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+@media(max-width:560px){
+  .flip{height:190px}
+  .block{padding:18px 16px}
+  .q{padding:16px}
+  .scorebar{top:53px}
+}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <p class="kicker">Pathophysiology · Huether Ch. 25–26</p>
+  <h1>The Cardiovascular System <span class="pulse">&amp;</span> Related Disorders</h1>
+  <p class="sub">Study guide: key terms, clinical essentials, and three 50-question practice tests built from the lecture.</p>
+</div></header>
+
+<nav><div class="wrap" id="tabs">
+  <button data-tab="terms" class="active">① Terminology</button>
+  <button data-tab="clinical">② Clinical Essentials</button>
+  <button data-tab="t1">③ Practice Test 1</button>
+  <button data-tab="t2">④ Practice Test 2</button>
+  <button data-tab="t3">⑤ Practice Test 3</button>
+</div></nav>
+
+<main>
+<!-- ============ 1. TERMS ============ -->
+<section class="panel active" id="terms">
+  <h2>Important Terminology</h2>
+  <p class="lead">Tap a card to flip it and see the definition. Filter by topic, search, or shuffle to quiz yourself.</p>
+  <div class="toolbar">
+    <div id="catChips" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    <span class="spacer"></span>
+    <input id="search" type="search" placeholder="Search terms…">
+    <button class="chip ghost" id="shuffleBtn">Shuffle</button>
+    <button class="chip ghost" id="resetFlip">Flip all to front</button>
+  </div>
+  <p class="counter" id="termCount"></p>
+  <div class="grid" id="cardGrid"></div>
+</section>
+
+<!-- ============ 2. CLINICAL ============ -->
+<section class="panel" id="clinical">
+  <h2>What You Need for Case Studies &amp; Clinical Judgment</h2>
+  <p class="lead">The concepts behind the "why" of each finding. If you can explain these cause→effect chains, you can reason through almost any case question.</p>
+  <div class="ess-nav">
+    <a href="#e1">Hemodynamics</a><a href="#e2">Cause → Effect</a><a href="#e3">Hypertension</a><a href="#e4">CAD &amp; MI</a><a href="#e5">Biomarkers &amp; ECG</a><a href="#e6">Valves</a><a href="#e7">Heart Failure</a><a href="#e8">HFrEF vs HFpEF</a><a href="#e9">Mrs. Smith Case</a><a href="#e10">Test Strategy</a>
+  </div>
+
+  <div class="block" id="e1">
+    <h3><span class="num">1</span>Hemodynamics: The Big Idea</h3>
+    <div>
+      <span class="formula">CO = SV × HR</span>
+      <span class="formula">SV = EDV − ESV</span>
+      <span class="formula">EF = SV ÷ EDV × 100</span>
+      <span class="formula">MAP = DBP + (SBP − DBP)/3</span>
+      <span class="formula">BP ≈ CO × SVR</span>
+    </div>
+    <h4>Stroke volume depends on three things</h4>
+    <ul>
+      <li><b>Preload</b>: how full and stretched the ventricle is at end-diastole. More stretch gives a stronger contraction (Frank-Starling), up to a limit.</li>
+      <li><b>Afterload</b>: the resistance the ventricle pushes against to eject (HTN, vasoconstriction, aortic stenosis). ↑ Afterload = ↑ workload and O₂ demand.</li>
+      <li><b>Contractility</b>: the squeeze force, independent of stretch. SNS and positive inotropes ↑ it; MI and cardiomyopathy ↓ it.</li>
+    </ul>
+    <div class="pearl"><b>Preload and afterload are NOT opposites.</b> They're independent. A hypertensive patient in fluid overload has ↑ preload AND ↑ afterload.</div>
+    <div class="pearl"><b>The HR trap:</b> CO = SV × HR, but a very fast HR (e.g., 180) shortens diastole, so filling and SV fall and <u>CO decreases</u>. Coronary arteries fill in diastole, so tachycardia also cuts O₂ supply.</div>
+    <div class="pearl"><b>Normal values to know:</b> CO ≈ 4–8 L/min · EF 50–70% · MAP ≥ 65 mmHg for organ perfusion · BNP &lt; 100 pg/mL · NT-proBNP &lt; 300 pg/mL.</div>
+  </div>
+
+  <div class="block" id="e2">
+    <h3><span class="num">2</span>Cause → Effect Cheat Table</h3>
+    <div class="tbl"><table>
+      <tr><th>Situation</th><th>Preload</th><th>Afterload</th><th>Contractility / HR</th><th>Net CO</th></tr>
+      <tr><td>Dehydration / hemorrhage</td><td>↓</td><td>↑ (compensatory vasoconstriction)</td><td>HR ↑ (SNS)</td><td>↓</td></tr>
+      <tr><td>IV fluid bolus / hypervolemia</td><td>↑</td><td>—</td><td>—</td><td>↑ (healthy heart); congestion if failing</td></tr>
+      <tr><td>Hypertension / vasoconstriction</td><td>—</td><td>↑</td><td>Work ↑, O₂ demand ↑</td><td>↓ over time (LVH, HF)</td></tr>
+      <tr><td>Sepsis / vasodilation</td><td>↓ (venous pooling)</td><td>↓ SVR</td><td>HR ↑</td><td>BP ↓</td></tr>
+      <tr><td>Extreme tachycardia (e.g., 180)</td><td>↓ (less filling time)</td><td>—</td><td>HR ↑↑</td><td>↓</td></tr>
+      <tr><td>Severe bradycardia (e.g., 38)</td><td>—</td><td>—</td><td>HR ↓↓</td><td>↓</td></tr>
+      <tr><td>Myocardial infarction</td><td>↑ (can't empty)</td><td>—</td><td>Contractility ↓</td><td>↓</td></tr>
+      <tr><td>Valve regurgitation</td><td>↑ (backflow refills chamber)</td><td>—</td><td>—</td><td>Forward flow ↓</td></tr>
+      <tr><td>Aortic stenosis</td><td>—</td><td>↑ (fixed obstruction)</td><td>LVH</td><td>↓, can't rise with exertion</td></tr>
+    </table></div>
+  </div>
+
+  <div class="block" id="e3">
+    <h3><span class="num">3</span>Hypertension</h3>
+    <div class="tbl"><table>
+      <tr><th>Category (AHA)</th><th>Systolic</th><th></th><th>Diastolic</th></tr>
+      <tr><td>Normal</td><td>&lt; 120</td><td>and</td><td>&lt; 80</td></tr>
+      <tr><td>Elevated</td><td>120–129</td><td>and</td><td>&lt; 80</td></tr>
+      <tr><td>Stage 1</td><td>130–139</td><td><b>or</b></td><td>80–89</td></tr>
+      <tr><td>Stage 2</td><td>≥ 140</td><td><b>or</b></td><td>≥ 90</td></tr>
+      <tr><td><b style="color:var(--red)">Hypertensive crisis</b></td><td>&gt; 180</td><td>and/or</td><td>&gt; 120</td></tr>
+    </table></div>
+    <div class="pearl"><b>Classify by the HIGHER category.</b> For example, 142/78 is Stage 2 because the SBP alone qualifies. HTN is <u>diagnosed over a series of visits</u> or with continuous monitoring, never from one reading. Pain and anxiety activate the SNS.</div>
+    <div class="two">
+      <div><h4>Risk factors: non-modifiable</h4><ul><li>Age</li><li>Family history</li><li>Race (higher in Black adults)</li><li>Sex</li></ul></div>
+      <div><h4>Risk factors: modifiable (teaching targets)</h4><ul><li>Smoking</li><li>High-sodium diet</li><li>Obesity and physical inactivity</li><li>Excess alcohol, stress</li><li>Hyperlipidemia, diabetes</li></ul></div>
+    </div>
+    <h4>Three physiologic systems drive HTN</h4>
+    <ul>
+      <li><b>RAAS:</b> ↓ renal perfusion → renin → angiotensin II (vasoconstriction, ↑ SVR) + aldosterone (Na⁺ and H₂O retention, ↑ volume).</li>
+      <li><b>SNS:</b> ↑ HR (chronotropic) + ↑ contractility (inotropic) = ↑ CO; vasoconstriction = ↑ SVR.</li>
+      <li><b>Endothelial dysfunction:</b> ↓ nitric oxide → impaired vasodilation, inflammation, plaque formation.</li>
+    </ul>
+    <h4>Vascular damage chain</h4>
+    <div class="flow"><span>Sustained ↑ BP</span><i>→</i><span>Shearing force on endothelium</span><i>→</i><span>Chronic inflammation</span><i>→</i><span>Arteriosclerosis (hardening) + Atherosclerosis (plaque)</span></div>
+    <h4>Cigarette smoke</h4>
+    <ul>
+      <li><b>↑ SNS response:</b> ↑ SBP and DBP, ↑ HR, ↑ CO and coronary flow demand, so more O₂ demand.</li>
+      <li><b>Pro-thrombotic:</b> ↑ platelet aggregation, ↑ platelet adhesiveness, ↑ blood viscosity, ↓ clotting time, so clots form on plaques (MI, stroke).</li>
+    </ul>
+    <h4>Target organ damage (connect the cue to the organ)</h4>
+    <div class="tbl"><table>
+      <tr><th>Organ</th><th>Damage</th><th>Clinical cue</th></tr>
+      <tr><td>Brain</td><td>Stroke, hypertensive encephalopathy</td><td>Headache, confusion, unilateral weakness, slurred speech</td></tr>
+      <tr><td>Eyes</td><td>Retinopathy</td><td>Blurred vision, retinal vessel changes</td></tr>
+      <tr><td>Heart</td><td>LVH → HF, CAD → MI</td><td>Dyspnea, S4, chest pain</td></tr>
+      <tr><td>Kidneys</td><td>Nephrosclerosis, CKD</td><td>↑ Creatinine, proteinuria (which worsens HTN via RAAS)</td></tr>
+      <tr><td>Vessels</td><td>PAD, aneurysm</td><td>Claudication, weak pulses</td></tr>
+    </table></div>
+  </div>
+
+  <div class="block" id="e4">
+    <h3><span class="num">4</span>Coronary Artery Disease, ACS &amp; MI</h3>
+    <h4>Supply vs. Demand: the framework for every chest-pain question</h4>
+    <div class="two">
+      <div><b>↓ Supply (coronary blood flow)</b><ul><li>Vasospasm (e.g., cocaine)</li><li>Fixed stenosis (plaque)</li><li>Thrombosis (plaque rupture)</li><li>Tachycardia (less diastolic filling)</li></ul></div>
+      <div><b>↑ Demand (O₂ consumption)</b><ul><li>↑ Heart rate</li><li>↑ Contractility</li><li>↑ Afterload</li><li>↑ Preload</li><li>(Fever, exertion, LVH)</li></ul></div>
+    </div>
+    <div class="flow"><span>Atherosclerotic plaque</span><i>→</i><span>Plaque rupture</span><i>→</i><span>Thrombus</span><i>→</i><span>Ischemia (reversible)</span><i>→</i><span>↓ ATP</span><i>→</i><span>Necrosis = MI (irreversible)</span><i>→</i><span>Troponin released</span></div>
+    <div class="two">
+      <div><h4>Classic MI</h4><ul><li>Sudden, severe, persistent chest pain</li><li>Heavy, crushing, tightness</li><li>Radiates to L arm or shoulder, jaw, neck, back</li><li><b>Not relieved by rest</b> (vs stable angina)</li></ul></div>
+      <div><h4>Atypical MI (~1 in 5!)</h4><ul><li>Fatigue, dyspnea</li><li>Nausea, "indigestion," epigastric pain</li><li>Diaphoresis, dizziness</li><li>Jaw or back discomfort only</li><li><b>Women, older adults, diabetics</b></li></ul></div>
+    </div>
+    <div class="alert"><b>Clinical judgment:</b> Any suspected MI means a <b>12-lead ECG first</b>. Never dismiss atypical symptoms in a high-risk patient as "just GI" or "just tired."</div>
+    <h4>MI diagnosis: 3 findings</h4>
+    <ol><li>Clinical presentation</li><li>12-lead ECG</li><li>Cardiac enzymes (troponin)</li></ol>
+    <h4>MI complications (and what to watch)</h4>
+    <div class="tbl"><table>
+      <tr><th>Complication</th><th>Mechanism</th><th>What you'd see</th></tr>
+      <tr><td>Electrical instability</td><td>Ischemic cells leak K⁺ and are irritable</td><td>PVCs, VT/VF, sudden death. <b>Continuous ECG monitoring.</b></td></tr>
+      <tr><td>Impaired contractility</td><td>Dead muscle becomes non-contractile scar</td><td>↓ SV, ↓ EF, hypotension, tachycardia → HF (crackles, S3)</td></tr>
+      <tr><td>Tissue necrosis</td><td>Weakened wall and papillary muscles</td><td>New systolic murmur + pulmonary edema (acute MR)</td></tr>
+    </table></div>
+  </div>
+
+  <div class="block" id="e5">
+    <h3><span class="num">5</span>ECG &amp; Cardiac Biomarkers</h3>
+    <div class="tbl"><table>
+      <tr><th>Waveform</th><th>Represents</th></tr>
+      <tr><td>P wave</td><td>Atrial depolarization</td></tr>
+      <tr><td>QRS complex</td><td>Ventricular depolarization</td></tr>
+      <tr><td>T wave</td><td>Ventricular repolarization</td></tr>
+      <tr><td>ST elevation</td><td>Acute myocardial injury (STEMI): ischemia → ↓ ATP → K⁺ leaks out → injured and healthy cells depolarize and repolarize at different rates</td></tr>
+    </table></div>
+    <div class="tbl"><table>
+      <tr><th>Marker</th><th>Detectable</th><th>Peak</th><th>Back to baseline</th><th>Key point</th></tr>
+      <tr><td><b>Troponin T &amp; I</b></td><td>3–12 hrs</td><td>24–48 hrs</td><td>5–14 days</td><td>Cardiac-specific (contractile protein). Gold standard. Good for late presenters.</td></tr>
+      <tr><td><b>CK / CK-MB</b></td><td>3–12 hrs</td><td>24 hrs</td><td>48–72 hrs</td><td>Clears fast, so a <b>new rise = reinfarction</b></td></tr>
+      <tr><td><b>Myoglobin</b></td><td>1–2 hrs</td><td>6–10 hrs</td><td>1–2 days</td><td>Earliest but NOT cardiac-specific</td></tr>
+    </table></div>
+    <div class="pearl"><b>Why "3–12 hrs" matters:</b> A normal troponin 1–2 hours after onset does <u>not</u> rule out MI. Draw serial troponins and treat based on the ECG. A normal ECG with rising troponin can still be an MI (NSTEMI).</div>
+  </div>
+
+  <div class="block" id="e6">
+    <h3><span class="num">6</span>Valve Disorders &amp; Murmurs</h3>
+    <div class="two">
+      <div><h4>Stenosis: "not enough blood passes through"</h4><ul><li>Valve doesn't open fully, so the chamber behind it works harder (pressure overload, hypertrophy)</li><li>Aortic and mitral are most common</li><li>Causes: rheumatic fever scarring, wear and tear (elderly), congenital</li></ul></div>
+      <div><h4>Regurgitation (incompetence): "blood leaks backwards"</h4><ul><li>Valve doesn't close, so the chamber gets volume overload and dilates</li><li>Causes: congenital or prolapse, rheumatic fever, cardiomyopathy, endocarditis, MI (papillary muscle)</li></ul></div>
+    </div>
+    <div class="tbl"><table>
+      <tr><th>Systolic murmurs</th><th>Diastolic murmurs</th></tr>
+      <tr><td>Aortic stenosis · Pulmonic stenosis<br>Mitral regurgitation · Tricuspid regurgitation</td><td>Aortic regurgitation · Pulmonic regurgitation<br>Mitral stenosis · Tricuspid stenosis</td></tr>
+    </table></div>
+    <div class="pearl"><b>Logic, not memorization:</b> In systole the semilunar valves (aortic, pulmonic) should be OPEN and the AV valves (mitral, tricuspid) CLOSED. So semilunar <i>stenosis</i> or AV <i>regurgitation</i> causes a systolic murmur. Flip everything for diastole.</div>
+    <h4>What would these patients present with?</h4>
+    <ul>
+      <li><b>Aortic stenosis:</b> exertional syncope, angina, dyspnea (fixed outflow, CO can't rise, LVH raises O₂ demand)</li>
+      <li><b>Mitral stenosis:</b> LA enlargement → atrial fibrillation, pulmonary congestion, dyspnea</li>
+      <li><b>Mitral regurgitation:</b> backflow to LA and lungs → dyspnea, crackles. Acute post-MI MR causes sudden pulmonary edema.</li>
+      <li><b>Aortic regurgitation:</b> LV volume overload → dilation → HF</li>
+      <li><b>Tricuspid regurgitation:</b> backflow to RA → JVD, peripheral edema</li>
+    </ul>
+  </div>
+
+  <div class="block" id="e7">
+    <h3><span class="num">7</span>Heart Failure</h3>
+    <p><b>Definition:</b> a complex clinical syndrome with <b>subjective</b> symptoms (dyspnea, fatigue) and <b>objective</b> findings (edema, crackles), caused by any disorder that impairs the ventricle's ability to <b>fill</b> or <b>eject</b>.</p>
+    <h4>Compensation: helpful at first, harmful later</h4>
+    <div class="tbl"><table>
+      <tr><th>Mechanism</th><th>Short-term benefit</th><th>Long-term harm</th></tr>
+      <tr><td>SNS activation</td><td>↑ HR, ↑ contractility → ↑ CO</td><td>↑ O₂ demand, vasoconstriction (↑ afterload), dysrhythmias</td></tr>
+      <tr><td>Na⁺ and fluid retention (RAAS)</td><td>↑ volume → ↑ preload → ↑ SV (Frank-Starling)</td><td>Congestion: pulmonary and peripheral edema</td></tr>
+      <tr><td>Dilation</td><td>More stretch → stronger contraction</td><td>Overstretched fibers → weaker contraction → ↓ CO</td></tr>
+      <tr><td>Hypertrophy</td><td>More muscle → more force</td><td>Impaired filling, ↑ O₂ needs, poor coronary flow, ventricular dysrhythmias</td></tr>
+    </table></div>
+    <h4>Left vs. Right HF</h4>
+    <div class="tbl"><table>
+      <tr><th></th><th>Left HF: backs up into LUNGS</th><th>Right HF: backs up into BODY</th></tr>
+      <tr><td>Edema</td><td>Pulmonary</td><td>Peripheral</td></tr>
+      <tr><td>Manifestations</td><td>Dyspnea, orthopnea (pillows!), cough with frothy sputum, crackles, tachypnea</td><td>JVD, hepatosplenomegaly, dependent pitting edema, weight gain, ascites</td></tr>
+      <tr><td>Patho</td><td>Can't generate enough CO to perfuse tissues</td><td>Can't move blood into pulmonary circulation at normal CVP</td></tr>
+      <tr><td>Common cause</td><td>MI, HTN, valve disease</td><td><b>Left HF</b> (also lung disease)</td></tr>
+    </table></div>
+    <div class="alert"><b>Decompensated HF / pulmonary edema red flags:</b> worsening dyspnea and orthopnea, new crackles, pink frothy sputum, ↓ SpO₂, rapid weight gain (≈1 kg per day = 1 L fluid), ↑ JVD, cool skin, confusion. <b>Priority:</b> high Fowler's, O₂, notify the provider.</div>
+    <h4>Natriuretic peptides</h4>
+    <ul>
+      <li><b>ANP</b> from the atria; <b>BNP</b> from the ventricles. Both are released with <b>stretch</b> and promote Na⁺ and H₂O excretion and vasodilation.</li>
+      <li>Normal: <b>BNP &lt; 100 pg/mL</b>, <b>NT-proBNP &lt; 300 pg/mL</b> (age-dependent).</li>
+      <li>Higher BNP means more stretch and worse prognosis. <b>Falling = improving. Rising = worsening</b>, even before symptoms.</li>
+    </ul>
+  </div>
+
+  <div class="block" id="e8">
+    <h3><span class="num">8</span>HFrEF vs HFpEF</h3>
+    <div class="tbl"><table>
+      <tr><th></th><th>HFpEF (Diastolic)</th><th>HFrEF (Systolic)</th></tr>
+      <tr><td>Problem</td><td>Filling, stiff ventricle</td><td>Pumping, weak ventricle</td></tr>
+      <tr><td>Ejection fraction</td><td>Normal / preserved (&gt; 50%)</td><td>Reduced (&lt; 40%)</td></tr>
+      <tr><td>Remodeling</td><td>Concentric hypertrophy (thick wall, small cavity)</td><td>Chamber dilation, eccentric remodeling</td></tr>
+      <tr><td>Typical patient</td><td>Elderly, more often female, long-standing HTN</td><td>All ages (typically 50–70), more often male, post-MI</td></tr>
+      <tr><td>Heart sound</td><td><b>S4</b>, late diastole, atrial kick into a stiff wall. "a-STIFF-wall"</td><td><b>S3</b>, early diastole, blood into an overfilled ventricle. "SLOSH-ing-in"</td></tr>
+      <tr><td>Hates…</td><td>Tachycardia and AF (lose filling time and atrial kick)</td><td>Volume overload</td></tr>
+    </table></div>
+    <div class="pearl"><b>EF math:</b> EDV 120 mL, ESV 84 mL → SV 36 → EF 30% → HFrEF. <b>Normal EF ≈ 50–70%.</b> A normal EF does NOT rule out heart failure.</div>
+  </div>
+
+  <div class="block" id="e9">
+    <h3><span class="num">9</span>Lecture Case: Mrs. Smith (worked through)</h3>
+    <p>A 72-year-old woman with HTN, hyperlipidemia, and an MI 10 years ago (2 stents). She has had a year of increasing exertional dyspnea, sleeps on several pillows, and noticed foot swelling 2 weeks ago. Exam: tachypnea, bibasilar crackles, cool skin, 2+ pitting pedal edema. CXR: lower-lung fluid, LV and RV hypertrophy.</p>
+    <details><summary>Step 1: Recognize cues</summary>
+      <ul><li><b>Risk history:</b> HTN (↑ afterload), hyperlipidemia (atherosclerosis), prior MI (lost myocardium)</li>
+      <li><b>Left-sided cues:</b> exertional dyspnea, orthopnea (pillows), tachypnea, crackles, fluid on CXR</li>
+      <li><b>Right-sided cues:</b> new pitting pedal edema</li>
+      <li><b>Low output cue:</b> cool skin (SNS vasoconstriction)</li>
+      <li><b>Remodeling:</b> biventricular hypertrophy</li></ul></details>
+    <details><summary>Step 2: Explain the pathophysiology from 10 years ago to today</summary>
+      <div class="flow"><span>HTN + hyperlipidemia</span><i>→</i><span>Atherosclerotic CAD</span><i>→</i><span>MI (10 yrs ago)</span><i>→</i><span>Necrosis → scar</span><i>→</i><span>↓ Contractility, ↓ SV</span><i>→</i><span>Compensation: SNS, RAAS, remodeling</span><i>→</i><span>Hypertrophy + dilation; chronic ↑ afterload from HTN</span><i>→</i><span>Compensation fails → LEFT HF (dyspnea, orthopnea, crackles)</span><i>→</i><span>↑ Pulmonary pressures → RV afterload ↑</span><i>→</i><span>RIGHT HF (pedal edema)</span></div>
+      <p>Today she has <b>biventricular HF</b>, likely <b>HFrEF</b> given the prior MI (expect an S3, EF &lt; 40%). Long-standing HTN also contributes to stiffness.</p></details>
+    <details><summary>Step 3: Prioritize, act, and evaluate</summary>
+      <ul><li><b>Priority problem:</b> impaired gas exchange from pulmonary congestion (ABCs).</li>
+      <li><b>Expected additional findings:</b> ↑ BNP, JVD, hepatomegaly, S3, weight gain.</li>
+      <li><b>Nursing actions:</b> high Fowler's, O₂, monitor SpO₂, lung sounds, daily weights, I&amp;O, and BNP trend. Notify for worsening.</li>
+      <li><b>Evaluate improvement:</b> fewer crackles, sleeping with fewer pillows, weight down, BNP falling, SpO₂ up.</li></ul></details>
+  </div>
+
+  <div class="block" id="e10">
+    <h3><span class="num">10</span>Clinical Judgment Test Strategy</h3>
+    <ul>
+      <li><b>Recognize cues → analyze → prioritize → act → evaluate.</b> For every finding, ask "what's the mechanism?" then "what does it threaten?"</li>
+      <li><b>Prioritize with ABCs and stability:</b> airway and breathing (pulmonary edema, SpO₂ ↓) &gt; circulation (MAP &lt; 65, chest pain unrelieved by rest, new ST elevation) &gt; stable chronic findings &gt; teaching.</li>
+      <li><b>Unstable beats expected:</b> new, sudden, or worsening findings beat chronic, unchanged ones.</li>
+      <li><b>Every compensation has a cost:</b> tachycardia ↑ demand and ↓ filling, vasoconstriction ↑ afterload, fluid retention causes congestion.</li>
+      <li><b>Left = lungs, Right = rest of the body.</b> Locate the backup to find the failing side.</li>
+      <li><b>Lab timing matters:</b> early normal troponin ≠ no MI; CK for reinfarction; BNP trend for HF.</li>
+      <li><b>Atypical is still an MI.</b> Women, older adults, diabetics: fatigue, nausea, dyspnea.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 3–5. TESTS ============ -->
+<section class="panel" id="t1"></section>
+<section class="panel" id="t2"></section>
+<section class="panel" id="t3"></section>
+</main>
+<footer>Built from "The Cardiovascular System and Related Disorders" (Huether, <i>Understanding Pathophysiology</i>, 8th ed., Ch. 25–26). For study use only.</footer>
+
+<script>
+const TERMS = [
+// Hemodynamics
+["Hemodynamics","Cardiac Output (CO)","The amount of blood the heart pumps in one minute (L/min or mL/min). CO = SV × HR. Normal adult is about 4–8 L/min."],
+["Hemodynamics","Stroke Volume (SV)","The amount of blood ejected from the ventricle with each contraction. SV = EDV − ESV. It depends on preload, afterload, and contractility."],
+["Hemodynamics","Heart Rate (HR)","Beats per minute. A higher HR raises CO only up to a point. A very fast HR shortens diastole, so the ventricles fill less and SV falls."],
+["Hemodynamics","Contractility","The force of the heart's contraction, separate from preload. The SNS increases it (a positive inotropic effect). An MI or cardiomyopathy decreases it."],
+["Hemodynamics","Preload","The pressure or volume of blood stretching the ventricles at the end of diastole (end-diastolic pressure). Increased by hypervolemia, valve regurgitation, and heart failure. Decreased by dehydration and hemorrhage."],
+["Hemodynamics","Afterload","The resistance the ventricles must overcome to eject blood during systole. Increased by hypertension, vasoconstriction, and aortic stenosis. ↑ Afterload = ↑ cardiac workload."],
+["Hemodynamics","Preload vs. Afterload: NOT opposites","They are independent. One patient can have high preload AND high afterload at the same time, for example a hypertensive patient with fluid overload."],
+["Hemodynamics","Mean Arterial Pressure (MAP)","The average arterial pressure over one cardiac cycle, reflecting organ perfusion pressure. MAP = DBP + (SBP − DBP) / 3. A MAP of at least about 65 mmHg is generally needed to perfuse vital organs."],
+["Hemodynamics","Systemic Vascular Resistance (SVR)","The total resistance to blood flow from the systemic vessels. Vasoconstriction raises SVR (and afterload). Vasodilation lowers it. BP ≈ CO × SVR."],
+["Hemodynamics","End-Diastolic Volume (EDV)","The amount of blood in the ventricle at the end of diastole (filling). It determines preload."],
+["Hemodynamics","End-Systolic Volume (ESV)","The amount of blood left in the ventricle after systole (ejection)."],
+["Hemodynamics","Ejection Fraction (EF)","The percentage of EDV ejected with each beat: EF = SV ÷ EDV × 100. Normal is about 50–70%. HFrEF is under 40%. HFpEF is over 50%."],
+["Hemodynamics","Frank-Starling Law","The more the ventricle is stretched by filling (↑ preload), the more forcefully it contracts, up to a limit. Overstretched fibers lose force, and CO falls."],
+["Hemodynamics","Positive Inotropic Effect","An increase in the force of contraction (contractility), for example from SNS stimulation."],
+["Hemodynamics","Positive Chronotropic Effect","An increase in heart rate, for example from SNS stimulation."],
+["Hemodynamics","Systole","The phase when the ventricles contract and pump blood out."],
+["Hemodynamics","Diastole","The phase when the ventricles relax and fill with blood. The coronary arteries fill mainly during diastole."],
+// HTN
+["Hypertension","Hypertension (HTN)","A sustained elevation of arterial blood pressure, and the leading cause of cardiovascular disease. It is diagnosed over a series of office visits and/or with continuous BP monitoring, not from one reading."],
+["Hypertension","BP Categories (AHA)","Normal: under 120 AND under 80. Elevated: 120–129 AND under 80. Stage 1: 130–139 OR 80–89. Stage 2: 140 or higher OR 90 or higher. Crisis: over 180 and/or over 120."],
+["Hypertension","Hypertensive Crisis","SBP over 180 and/or DBP over 120. Needs immediate attention, especially with signs of target organ damage (headache, confusion, chest pain, vision changes)."],
+["Hypertension","RAAS","The renin-angiotensin-aldosterone system. Low renal perfusion leads to renin release, then angiotensin II (a strong vasoconstrictor that ↑ SVR) and aldosterone (Na⁺ and water retention that ↑ volume). Net result: ↑ BP."],
+["Hypertension","Sympathetic Nervous System (SNS)","The 'fight or flight' system. It raises HR (chronotropic), contractility (inotropic), and vasoconstriction, which raises CO and SVR and therefore BP. Chronic activation contributes to HTN and HF."],
+["Hypertension","Endothelium","The inner lining of blood vessels. A healthy endothelium makes nitric oxide (a vasodilator) and resists clotting and inflammation."],
+["Hypertension","Endothelial Dysfunction","Damaged endothelium with less nitric oxide. This leads to impaired vasodilation, inflammation, and plaque formation, and contributes to HTN and atherosclerosis."],
+["Hypertension","Shearing Force","The mechanical stress that blood pressure places on vessel walls. Over time it injures the endothelium and causes chronic inflammation."],
+["Hypertension","Arteriosclerosis","Hardening and stiffening of the arteries (loss of elasticity)."],
+["Hypertension","Atherosclerosis","The build-up of fatty plaques inside arterial walls. It is the underlying cause of CAD."],
+["Hypertension","Target Organ Damage","Damage to organs from chronic uncontrolled HTN. Brain: stroke. Eyes: retinopathy. Heart: LVH, CAD, HF. Kidneys: CKD. Vessels: PAD and aneurysm."],
+["Hypertension","Modifiable Risk Factors","Risk factors a patient can change: smoking, high-sodium diet, obesity, physical inactivity, excess alcohol, stress, hyperlipidemia, and diabetes control."],
+["Hypertension","Non-modifiable Risk Factors","Risk factors a patient cannot change: age, family history, race (higher in Black adults), and sex."],
+["Hypertension","Cigarette Smoke: CV Effects","① ↑ SNS response, which raises SBP, DBP, HR, CO, and coronary flow demand. ② A pro-thrombotic state: ↑ platelet aggregation and adhesiveness, ↑ blood viscosity, and ↓ clotting time."],
+// CAD/MI
+["CAD & MI","Coronary Artery Disease (CAD)","Narrowing of the coronary arteries, usually from atherosclerosis, which reduces blood flow to the myocardium."],
+["CAD & MI","Supply vs. Demand","Angina happens when myocardial O₂ demand exceeds supply. Supply falls with vasospasm, fixed stenosis, or thrombosis. Demand rises with higher HR, contractility, afterload, or preload."],
+["CAD & MI","Angina","Chest pain from myocardial ischemia (O₂ supply under demand). Stable angina is predictable with exertion and is relieved by rest."],
+["CAD & MI","Acute Coronary Syndrome (ACS)","A spectrum of acute myocardial ischemia (unstable angina, NSTEMI, STEMI), usually caused by plaque rupture with thrombus formation."],
+["CAD & MI","Acute Myocardial Infarction (AMI)","Death (necrosis) of heart muscle from prolonged ischemia. Diagnosis is based on 3 findings: clinical presentation, 12-lead ECG, and cardiac enzymes."],
+["CAD & MI","Ischemia vs. Infarction","Ischemia is reduced O₂ to tissue and is reversible if flow is restored. Infarction is tissue death (necrosis) and is irreversible."],
+["CAD & MI","Classic MI Symptoms","Sudden, severe, persistent chest pain described as heavy, crushing, or tight. It radiates to the left arm or shoulder, jaw, neck, or back."],
+["CAD & MI","Atypical MI Symptoms","About 1 in 5 MIs present without classic pain. Look for fatigue, dyspnea, nausea or indigestion, diaphoresis, dizziness, and epigastric, jaw, or back discomfort. More common in women, older adults, and people with diabetes."],
+["CAD & MI","P Wave","Atrial depolarization on the ECG."],
+["CAD & MI","QRS Complex","Ventricular depolarization on the ECG (it triggers ventricular contraction)."],
+["CAD & MI","T Wave","Ventricular repolarization on the ECG."],
+["CAD & MI","ST Elevation","An ST segment raised above baseline, indicating acute myocardial injury. Ischemia means ↓ ATP, so K⁺ leaks from damaged cells. Damaged and healthy cells then depolarize and repolarize at different rates."],
+["CAD & MI","Troponin (cTnI / cTnT)","A cardiac-specific regulatory protein on the contractile filaments, released when myocytes are damaged. Detectable at 3–12 hrs, peaks at 24–48 hrs, and returns to baseline in 5–14 days. It is the gold-standard MI marker."],
+["CAD & MI","Creatine Kinase (CK / CK-MB)","Detectable at 3–12 hrs, peaks at about 24 hrs, and returns to baseline in 48–72 hrs. Its quick return makes it useful for spotting a reinfarction."],
+["CAD & MI","Myoglobin","The earliest marker to rise (1–2 hrs), peaking at 6–10 hrs and back to baseline in 1–2 days. It is NOT cardiac-specific because skeletal muscle has it too."],
+["CAD & MI","MI Complications","Tissue necrosis (scar, possible wall rupture or papillary muscle damage), impaired contractility (which leads to HF), and electrical instability (which leads to dysrhythmias)."],
+// Valves
+["Valves","Valve Stenosis","A narrowed or stiff valve that doesn't open fully, so not enough blood passes through. The chamber behind it must work harder. Causes: rheumatic fever scarring, wear and tear, and congenital defects."],
+["Valves","Valve Regurgitation (Incompetence)","A valve that doesn't close fully, so blood leaks backward. Causes: congenital defects or prolapse, rheumatic fever, cardiomyopathy, endocarditis, and MI."],
+["Valves","Murmur","A prolonged whooshing sound caused by turbulent blood flow across a stenotic or regurgitant valve."],
+["Valves","Systolic Murmurs","Aortic and pulmonic STENOSIS, plus mitral and tricuspid REGURGITATION."],
+["Valves","Diastolic Murmurs","Aortic and pulmonic REGURGITATION, plus mitral and tricuspid STENOSIS."],
+["Valves","Rheumatic Fever","An inflammatory complication of untreated strep infection that can scar heart valves, especially the mitral and aortic valves. It causes stenosis or regurgitation years later."],
+// HF
+["Heart Failure","Heart Failure (HF)","A complex clinical syndrome with subjective symptoms (dyspnea, fatigue) and objective findings (edema, crackles). It is caused by any structural or functional disorder that impairs the ventricle's ability to fill with or eject blood."],
+["Heart Failure","Compensatory Mechanisms in HF","① Cardiac remodeling (dilation and thicker walls). ② Na⁺ and fluid retention (RAAS) to ↑ volume. ③ SNS activation to ↑ contractility and HR. All of these help at first and harm over time."],
+["Heart Failure","Cardiac Remodeling","Changes in the size, shape, and wall thickness of the heart in response to injury or chronic overload."],
+["Heart Failure","Dilation","Enlargement of the heart chambers when ventricular pressure stays high. It is adaptive at first (Frank-Starling) but eventually becomes inadequate, and CO falls."],
+["Heart Failure","Hypertrophy","Increased muscle mass and wall thickness. It leads to impaired filling, higher O₂ needs, poor coronary circulation, and risk of ventricular dysrhythmias."],
+["Heart Failure","Concentric vs. Eccentric Remodeling","Concentric: a thick wall with a smaller cavity, typical of HFpEF (pressure overload, like HTN). Eccentric: a dilated chamber, typical of HFrEF (volume overload or MI)."],
+["Heart Failure","Left-Sided HF","The LV can't pump enough to perfuse tissues, so blood backs up into the LUNGS. Pulmonary edema causes dyspnea, orthopnea, crackles, and cough with frothy sputum."],
+["Heart Failure","Right-Sided HF","The RV can't move blood into the pulmonary circulation, so blood backs up into the SYSTEMIC veins. This causes JVD, peripheral edema, and hepatosplenomegaly. The most common cause is left HF."],
+["Heart Failure","HFrEF (Systolic HF)","HF with reduced ejection fraction (EF under 40%), a pumping problem. Chamber dilation, eccentric remodeling, and an S3. Often age 50–70 and more often male. 'SLOSH-ing-in.'"],
+["Heart Failure","HFpEF (Diastolic HF)","HF with preserved ejection fraction (EF over 50%), a filling problem from a stiff ventricle. Concentric hypertrophy and an S4. Frequently elderly and more often female. 'a-STIFF-wall.'"],
+["Heart Failure","S3 Gallop","An early-diastolic, low-pitched sound ('SLOSH-ing-in') heard when the mitral valve opens and blood enters an overfilled ventricle. It suggests poor systolic function and/or volume overload (HFrEF)."],
+["Heart Failure","S4 Gallop","A late-diastolic, low-pitched sound ('a-STIFF-wall') from the atrial kick squeezing blood into a stiff ventricle. It suggests poor diastolic function (HFpEF)."],
+["Heart Failure","Atrial Kick","Atrial contraction at the end of diastole that 'tops off' ventricular filling. It is especially important for a stiff ventricle (HFpEF)."],
+["Heart Failure","Orthopnea","Dyspnea when lying flat, relieved by sitting up. Patients sleep on several pillows. It is a sign of pulmonary congestion (left HF)."],
+["Heart Failure","Jugular Venous Distension (JVD)","Bulging neck veins from elevated central venous pressure, a sign of right-sided HF or fluid overload."],
+["Heart Failure","Hepatosplenomegaly","Enlarged liver and spleen from systemic venous congestion (right-sided HF)."],
+["Heart Failure","Pulmonary Edema","Lung alveoli fill with fluid because pulmonary capillary pressure is high. Causes severe dyspnea, crackles, hypoxemia, and pink frothy sputum. It is a sign of decompensated left HF."],
+["Heart Failure","Decompensated HF","Compensation fails and symptoms worsen: more dyspnea and orthopnea, crackles, rapid weight gain, more edema and JVD, fatigue, and hypoxemia."],
+["Heart Failure","ANP","Atrial natriuretic peptide, a hormone secreted from the ATRIA when they are stretched. It promotes Na⁺ and water excretion and vasodilation."],
+["Heart Failure","BNP","B-type natriuretic peptide, secreted from the VENTRICLES when they are stretched. Higher BNP means more stretch, poorer cardiac health, and worse survival. Generally normal under 100 pg/mL."],
+["Heart Failure","NT-proBNP","An inactive fragment released with BNP. Generally normal under 300 pg/mL (age-dependent). Trends matter: falling levels mean less ventricular stretch."],
+];
+
+const TEST1 = [
+{t:"A",q:"A patient's heart rate is 70 bpm and stroke volume is 70 mL. What is the cardiac output?",o:["4.9 L/min","140 mL/min","0.49 L/min","49 L/min"],a:0,r:"CO = SV × HR = 70 mL × 70 bpm = 4,900 mL/min = 4.9 L/min, which is within the normal range."},
+{t:"A",q:"A patient's blood pressure is 150/90 mmHg. What is the mean arterial pressure (MAP)?",o:["110 mmHg","120 mmHg","100 mmHg","105 mmHg"],a:0,r:"MAP = DBP + (SBP − DBP)/3 = 90 + (60/3) = 90 + 20 = 110 mmHg."},
+{t:"J",q:"After a GI bleed, a patient's BP is 78/48 mmHg (MAP 58), HR 124, and urine output is 10 mL/hr. Which interpretation is most accurate?",o:["MAP is too low to adequately perfuse vital organs such as the kidneys","The tachycardia means cardiac output is elevated and perfusion is adequate","Low urine output is unrelated to the blood pressure","The MAP is normal, so only the HR needs attention"],a:0,r:"MAP reflects organ perfusion pressure, and below about 60–65 mmHg the organs are underperfused. Low urine output is a direct cue of poor renal perfusion. The tachycardia is compensation for falling SV, not a sign of adequate CO."},
+{t:"C",q:"A patient becomes severely dehydrated from vomiting and diarrhea. Which hemodynamic change is expected first?",o:["Decreased preload, leading to decreased stroke volume","Increased afterload, leading to increased stroke volume","Increased preload, leading to increased cardiac output","Decreased contractility from a primary heart muscle problem"],a:0,r:"Less circulating volume means less blood filling the ventricles at end-diastole (↓ preload). By Frank-Starling, less stretch means a weaker contraction and ↓ SV, so ↓ CO. The SNS then raises HR to compensate."},
+{t:"C",q:"A patient in hypertensive crisis develops widespread systemic vasoconstriction. What happens to the heart?",o:["Afterload increases, so the ventricle must generate more pressure and myocardial O₂ demand rises","Afterload decreases, so the ventricle ejects blood more easily","Preload decreases because vasoconstriction reduces venous return to zero","Nothing changes, because vasoconstriction affects only the vessels"],a:0,r:"Vasoconstriction raises SVR, which is afterload. The LV must work harder to open the aortic valve and eject, which increases workload and O₂ consumption."},
+{t:"C",q:"A patient's heart rate suddenly increases from 80 bpm to 180 bpm. What is the most likely effect on cardiac output?",o:["CO decreases because the shortened diastole reduces ventricular filling and stroke volume","CO more than doubles because CO = SV × HR","CO stays the same because stroke volume is fixed","CO increases because contractility always rises with HR"],a:0,r:"At very high rates, diastole is drastically shortened, so the ventricles don't fill (↓ preload, then ↓ SV). The drop in SV outweighs the rise in HR, so CO falls. Coronary perfusion, which happens mostly in diastole, also suffers."},
+{t:"A",q:"Patient A: BP 184/102, HR 92. Patient B: BP 100/58, HR 92. Whose heart is working against a greater afterload?",o:["Patient A","Patient B","Both are the same because the HR is the same","Cannot be determined"],a:0,r:"Afterload is the resistance the ventricle ejects against, and higher arterial pressure and vasoconstriction mean higher afterload. HR does not determine afterload."},
+{t:"C",q:"Which conditions increase preload? (Select all that apply.)",o:["Hypervolemia","Mitral or aortic valve regurgitation","Heart failure","Hemorrhage","Severe dehydration"],a:[0,1,2],r:"More volume in the ventricle at end-diastole raises preload. Fluid overload, regurgitant valves (blood leaks back and refills the chamber), and HF (poor emptying plus fluid retention) all do this. Hemorrhage and dehydration decrease preload."},
+{t:"C",q:"A medication increases the force of ventricular contraction without changing heart rate. How is this effect best described?",o:["Positive inotropic effect","Positive chronotropic effect","Negative inotropic effect","Decrease in afterload"],a:0,r:"Inotropy is contractility (force), and chronotropy is rate. A positive inotrope increases force, which raises SV."},
+{t:"A",q:"A client's BP is 134/86 mmHg on repeated readings. How is this classified?",o:["Stage 1 hypertension","Elevated","Normal","Stage 2 hypertension"],a:0,r:"Stage 1 is SBP 130–139 OR DBP 80–89. Both numbers fall in the Stage 1 range here."},
+{t:"A",q:"A client's BP is 126/78 mmHg on repeated readings. How is this classified?",o:["Elevated","Normal","Stage 1 hypertension","Stage 2 hypertension"],a:0,r:"Elevated is SBP 120–129 AND DBP under 80. Lifestyle changes are recommended to prevent progression."},
+{t:"J",q:"A client's BP is 192/124 mmHg and they report a severe headache and blurred vision. What is the nurse's priority action?",o:["Notify the provider immediately; this is a hypertensive crisis with signs of target organ damage","Recheck the BP in 4 hours","Teach the client about a low-sodium diet","Document the finding as Stage 2 hypertension"],a:0,r:"BP over 180 and/or over 120 is a hypertensive crisis. Headache and vision changes suggest brain and eye (target organ) involvement, which needs immediate intervention. Teaching and documenting are not the priority."},
+{t:"A",q:"A client's BP is consistently 142/78 mmHg. How is this classified?",o:["Stage 2 hypertension","Stage 1 hypertension","Elevated","Normal, because the diastolic is under 80"],a:0,r:"For the hypertension stages, an OR rule applies, and the higher category wins. An SBP of 140 or above alone makes this Stage 2, even though the DBP is normal."},
+{t:"J",q:"An anxious client in the ED with an ankle sprain has a single BP reading of 148/92. The client asks, 'Do I have high blood pressure now?' What is the best response?",o:["\"Hypertension is diagnosed from readings over several visits or with continuous monitoring, so we'll recommend follow-up.\"","\"Yes, you have Stage 2 hypertension and will need medication.\"","\"No, your blood pressure is completely normal.\"","\"Pain never affects blood pressure, so this is accurate.\""],a:0,r:"HTN is a sustained elevation diagnosed over a series of visits or with ambulatory monitoring. Pain and anxiety activate the SNS and can raise a single reading."},
+{t:"C",q:"Which risk factors for hypertension can the nurse target with teaching? (Select all that apply.)",o:["Cigarette smoking","High-sodium diet","Obesity","Physical inactivity","Family history of HTN","Advanced age"],a:[0,1,2,3],r:"Smoking, sodium, weight, and activity are modifiable. Family history and age are non-modifiable. Teaching should focus on factors the client can change."},
+{t:"C",q:"Which statement best explains how the RAAS raises blood pressure?",o:["Angiotensin II causes vasoconstriction (↑ SVR) and aldosterone causes Na⁺ and water retention (↑ blood volume)","Renin directly dilates the arterioles to lower resistance","Aldosterone causes the kidneys to excrete sodium and water","Angiotensin II decreases heart rate and contractility"],a:0,r:"RAAS raises BP by both mechanisms: resistance (angiotensin II vasoconstriction) and volume (aldosterone, which leads to ↑ preload and ↑ CO)."},
+{t:"C",q:"A client with chronic stress has persistent SNS activation. How does this contribute to hypertension?",o:["It raises HR and contractility (↑ CO) and causes vasoconstriction (↑ SVR)","It lowers HR and dilates vessels","It decreases renin release, lowering blood volume","It affects only respiratory rate"],a:0,r:"BP ≈ CO × SVR. The SNS increases both: positive chronotropic and inotropic effects raise CO, and alpha-mediated vasoconstriction raises SVR."},
+{t:"C",q:"Endothelial dysfunction contributes to hypertension and atherosclerosis mainly because the damaged endothelium:",o:["Produces less nitric oxide, impairing vasodilation and promoting inflammation and plaque formation","Produces excess nitric oxide, causing severe vasodilation","Stops all blood flow through the artery","Becomes more elastic and absorbs pressure"],a:0,r:"A healthy endothelium releases nitric oxide (a vasodilator, anti-inflammatory and anti-clotting). A damaged one allows vasoconstriction, inflammation, and plaque build-up."},
+{t:"C",q:"Over many years, how does chronic hypertension damage blood vessels?",o:["Shearing force injures the endothelium, triggering chronic inflammation, arteriosclerosis, and atherosclerosis","High pressure makes vessels more flexible and protective","Hypertension damages only veins, not arteries","Hypertension dissolves existing plaques"],a:0,r:"Constant high pressure creates shear stress on the endothelium. This leads to chronic inflammation, then hardening (arteriosclerosis) and plaque formation (atherosclerosis)."},
+{t:"C",q:"Which cardiovascular effects of cigarette smoke favor thrombosis? (Select all that apply.)",o:["Increased platelet aggregation","Increased platelet adhesiveness","Increased blood viscosity","Decreased clotting time","Decreased platelet adhesiveness"],a:[0,1,2,3],r:"Smoking creates a pro-thrombotic state: stickier, more aggregated platelets, thicker blood, and faster clotting. This raises the risk of MI and stroke."},
+{t:"J",q:"A 48-year-old smoker with known CAD asks why smoking raises their heart attack risk. Which explanation is most complete?",o:["Nicotine stimulates the SNS (raising HR and BP, so the heart needs more O₂), and smoke makes blood clot more easily in narrowed arteries","Smoking lowers heart rate, so the heart gets less blood","Smoking only damages the lungs, not the heart","Smoking lowers blood pressure, which reduces coronary flow"],a:0,r:"Both mechanisms matter. SNS stimulation raises O₂ demand, and the pro-thrombotic effects increase the chance of a clot forming on a plaque. Together they upset supply and demand."},
+{t:"J",q:"A client with 15 years of poorly controlled HTN has rising serum creatinine and protein in the urine. The nurse recognizes this as:",o:["Target organ damage to the kidneys from chronic hypertension","An expected, harmless finding with aging","Evidence that the BP is well controlled","Acute myocardial infarction"],a:0,r:"Chronic high pressure damages the renal vasculature (nephrosclerosis), so filtration falls (↑ creatinine) and the glomeruli leak protein. Worsening kidney function can further raise BP through RAAS, creating a vicious cycle."},
+{t:"J",q:"A client with long-standing HTN reports gradually worsening blurry vision. What is the most likely explanation?",o:["Hypertensive retinopathy, a type of target organ damage","Normal presbyopia only","A side effect of normal blood pressure","Atrial depolarization abnormality"],a:0,r:"The small retinal vessels are damaged by chronic HTN (target organ: eyes). Vision changes in a hypertensive client should be reported and assessed."},
+{t:"C",q:"Why does chronic hypertension lead to left ventricular hypertrophy (LVH)?",o:["The LV pumps against chronically increased afterload, so the muscle thickens to generate more force","Low blood volume causes the ventricle to shrink","Hypertension lowers afterload, letting the muscle grow","LVH is caused only by valve regurgitation"],a:0,r:"Like any muscle working against resistance, the LV thickens (concentric hypertrophy). Over time this stiffens the wall, impairs filling, and raises O₂ demand."},
+{t:"J",q:"A client with uncontrolled HTN suddenly develops right-sided weakness and slurred speech. The nurse recognizes this as:",o:["A possible stroke, a target organ complication of hypertension in the brain","An expected finding in Stage 1 hypertension","Right-sided heart failure","A side effect of elevated preload"],a:0,r:"The brain is a major target organ. Chronic HTN damages cerebral vessels (atherosclerosis, weak walls), leading to ischemic or hemorrhagic stroke. This is an emergency, so activate the stroke response."},
+{t:"C",q:"Why is tachycardia especially dangerous for a patient with coronary artery disease?",o:["It increases O₂ demand while shortening diastole, the time when coronary arteries fill","It improves coronary perfusion by pumping faster","It decreases afterload and myocardial workload","It has no effect on myocardial oxygen balance"],a:0,r:"Coronary arteries are perfused mainly during diastole. Tachycardia raises demand (more beats) and cuts supply (less diastolic filling time). This double hit can cause angina."},
+{t:"A",q:"A patient has severe pulmonic valve stenosis. Blood flow between which two structures is directly impaired?",o:["Right ventricle to pulmonary artery","Left ventricle to aorta","Left atrium to left ventricle","Right atrium to right ventricle"],a:0,r:"Blood flows from the RA through the tricuspid valve to the RV, then through the pulmonic valve to the pulmonary artery and lungs. A stenotic pulmonic valve obstructs RV outflow, raising RV afterload."},
+{t:"C",q:"Which factors increase myocardial oxygen demand? (Select all that apply.)",o:["Increased heart rate","Increased contractility","Increased afterload","Increased preload","Coronary vasospasm"],a:[0,1,2,3],r:"Demand rises with HR, contractility, afterload, and preload (wall stress). Vasospasm is a SUPPLY problem because it reduces coronary blood flow."},
+{t:"C",q:"A client has chest pain every time they climb stairs, and it resolves with rest. What is the best pathophysiologic explanation?",o:["A fixed coronary stenosis can't increase flow to meet the higher O₂ demand of exertion","The coronary arteries are completely occluded at all times","Exercise lowers myocardial O₂ demand","The pain comes from the lungs, not the heart"],a:0,r:"This is stable angina. At rest, supply through the narrowed artery is enough. During exertion, demand rises but the fixed plaque limits supply. Rest restores the balance."},
+{t:"J",q:"A 58-year-old man has had crushing substernal chest pain radiating to his jaw for 30 minutes, unrelieved by rest. Which action is the priority?",o:["Obtain a 12-lead ECG immediately","Draw a lipid panel","Teach about smoking cessation","Have him walk to see if the pain changes"],a:0,r:"Persistent pain unrelieved by rest suggests ACS or MI. A 12-lead ECG within minutes identifies ST elevation (STEMI) that needs emergent reperfusion. Lipids and teaching come later, and exertion increases demand."},
+{t:"J",q:"A 74-year-old woman with diabetes reports new fatigue, nausea, and shortness of breath but denies chest pain. What should the nurse conclude?",o:["These may be atypical MI symptoms, and a cardiac work-up is needed","MI is ruled out because there is no chest pain","These are only GI symptoms","She is just tired from aging"],a:0,r:"About 1 in 5 MIs present atypically. Women, older adults, and people with diabetes are more likely to have fatigue, dyspnea, nausea, or epigastric discomfort instead of crushing chest pain."},
+{t:"C",q:"An acute MI diagnosis is based on which findings? (Select all that apply.)",o:["Clinical presentation","12-lead ECG","Cardiac enzymes (biomarkers)","Chest X-ray","BNP level"],a:[0,1,2],r:"The lecture's triad is presentation, ECG, and cardiac enzymes such as troponin. A CXR and BNP are used for HF, not to diagnose MI."},
+{t:"J",q:"A patient arrives 1 hour after chest pain began. The initial troponin is normal. What is the best interpretation?",o:["Troponin may not be detectable yet (it rises 3–12 hrs after onset), so serial troponins are needed","MI is definitively ruled out","The lab made an error","Troponin is not used to diagnose MI"],a:0,r:"Troponin becomes detectable 3–12 hours after ischemia begins. An early normal value does not rule out MI, so repeat it per protocol and correlate with the ECG and symptoms."},
+{t:"A",q:"A patient comes to the clinic 6 days after an episode of severe chest pain they ignored. Which biomarker is most likely to still be elevated?",o:["Troponin","Myoglobin","CK-MB","None; all markers will be back to baseline"],a:0,r:"Troponin stays elevated for 5–14 days. CK returns to baseline in 48–72 hrs and myoglobin in 1–2 days."},
+{t:"C",q:"Myoglobin rises 1–2 hours after MI, earlier than troponin. Why is it NOT used alone to diagnose MI?",o:["It isn't cardiac-specific, since skeletal muscle injury also raises it","It never rises after MI","It takes 2 weeks to rise","It is found only in the lungs"],a:0,r:"Myoglobin is fast but nonspecific: trauma, IM injections, or exercise can raise it. Troponin is cardiac-specific because it comes from the cardiac contractile apparatus."},
+{t:"C",q:"Why is troponin such a specific marker of myocardial injury?",o:["Cardiac troponins (cTnI, cTnT) are regulatory proteins of the heart's contractile filaments, released when myocytes are damaged","It is made by the liver in response to chest pain","It is released by the lungs during dyspnea","It rises with any skeletal muscle exercise"],a:0,r:"The cardiac forms of troponin I and T are part of the actin-myosin regulatory complex in heart muscle. Their presence in blood signals that myocyte membranes are damaged."},
+{t:"C",q:"Which sequence best explains why ST elevation appears during an acute MI?",o:["Ischemia → ↓ ATP → K⁺ channels can't close → K⁺ leaks from injured cells → injured and healthy cells depolarize and repolarize at different rates","Too much ATP → K⁺ moves into cells → faster conduction","Valve regurgitation → turbulent flow → ST elevation","Atrial enlargement → large P waves → ST elevation"],a:0,r:"Without ATP, injured cells leak K⁺. The resulting electrical difference between injured and healthy tissue shows up as ST segment elevation on the 12-lead."},
+{t:"A",q:"On an ECG strip, which waveform represents the ventricles recovering electrically (resetting) after contraction?",o:["T wave","P wave","QRS complex","PR interval"],a:0,r:"P = atrial depolarization, QRS = ventricular depolarization, T = ventricular repolarization."},
+{t:"J",q:"A patient 1 day after an MI suddenly becomes unresponsive and pulseless. Which MI complication most likely caused this?",o:["Electrical instability causing a lethal ventricular dysrhythmia","Hypertensive retinopathy","Mitral stenosis from rheumatic fever","Elevated BNP"],a:0,r:"Ischemic and necrotic myocardium is electrically irritable, leading to ventricular dysrhythmias such as VT or VF. This is why post-MI patients are on continuous cardiac monitoring."},
+{t:"J",q:"Two weeks after a large anterior MI, a patient develops dyspnea, bilateral crackles, and an S3. What best explains these findings?",o:["Impaired contractility from necrotic myocardium has caused left-sided heart failure","Normal healing after MI","Hypertensive crisis","Aortic stenosis from wear and tear"],a:0,r:"Dead myocardium doesn't contract, so SV falls and blood backs up into the lungs (crackles, dyspnea). An S3 suggests volume overload or poor systolic function (HFrEF)."},
+{t:"J",q:"An 80-year-old has exertional dizziness, angina, and a harsh systolic murmur. Which explanation fits best?",o:["Aortic stenosis obstructs LV outflow, so CO can't rise with exertion and the hypertrophied LV needs more O₂","Mitral stenosis causes a systolic murmur and syncope","Tricuspid regurgitation causes angina","These are normal aging findings"],a:0,r:"Aortic stenosis is a systolic murmur and is common in older adults (wear and tear). The fixed outflow obstruction raises afterload (leading to LVH and ↑ O₂ demand, so angina) and limits CO during exertion (dizziness or syncope)."},
+{t:"C",q:"In mitral regurgitation, where does blood flow abnormally, and what is the consequence?",o:["Back into the left atrium during systole, raising LA and pulmonary pressures and causing pulmonary congestion","Into the right ventricle during diastole","From the aorta into the LV during diastole","There is no abnormal flow"],a:0,r:"An incompetent mitral valve lets blood leak back into the LA when the LV contracts (a systolic murmur). The LA dilates and pressure transmits back to the lungs."},
+{t:"A",q:"During auscultation, the nurse hears a murmur during diastole. Which valve disorders could produce it? (Select all that apply.)",o:["Mitral stenosis","Aortic regurgitation","Aortic stenosis","Mitral regurgitation"],a:[0,1],r:"Diastolic murmurs: AV valve STENOSIS (mitral or tricuspid) and semilunar REGURGITATION (aortic or pulmonic). Aortic stenosis and mitral regurgitation are systolic."},
+{t:"J",q:"A 45-year-old with a childhood history of untreated strep throat and rheumatic fever now has progressive dyspnea. What is most likely?",o:["Valve stenosis or regurgitation from rheumatic scarring, most often of the mitral or aortic valve","Hypertensive crisis","A normal finding unrelated to the history","Isolated pulmonary edema from dehydration"],a:0,r:"Rheumatic fever scars the valves (especially mitral and aortic), causing stenosis or regurgitation decades later."},
+{t:"C",q:"Which combination of findings best fits the definition of heart failure?",o:["Subjective dyspnea or fatigue plus objective edema or crackles, caused by a disorder that impairs ventricular filling or ejection","Chest pain only","Hypertension alone without symptoms","Elevated myoglobin"],a:0,r:"HF is a clinical syndrome with subjective symptoms (dyspnea, fatigue) and objective findings (edema, crackles), caused by any structural or functional problem with filling or ejection."},
+{t:"C",q:"In heart failure, SNS activation raises HR and contractility. Why does this compensation eventually worsen HF?",o:["It increases myocardial O₂ demand and workload on an already failing heart","It permanently restores normal cardiac output","It lowers afterload","It improves diastolic filling time"],a:0,r:"The SNS helps CO in the short term. Chronically, tachycardia and vasoconstriction (↑ afterload) exhaust the myocardium, raise O₂ demand, and promote remodeling and dysrhythmias."},
+{t:"C",q:"In HF, the kidneys retain sodium and water through RAAS. What is the initial benefit, and what is the long-term problem?",o:["↑ volume and preload improves SV by Frank-Starling at first, but eventually causes congestion and edema","It lowers blood volume, which helps the heart rest","It lowers preload, which always improves CO","It has no effect on preload"],a:0,r:"More volume means more stretch, so SV rises at first. But a failing ventricle can't handle the extra volume, so pressure backs up into the lungs (crackles) or periphery (edema)."},
+{t:"C",q:"Which findings are consistent with LEFT-sided heart failure? (Select all that apply.)",o:["Dyspnea","Orthopnea","Cough with frothy sputum","Bilateral crackles","Jugular venous distension","Hepatosplenomegaly"],a:[0,1,2,3],r:"In left HF, blood backs up into the lungs (pulmonary edema). JVD and hepatosplenomegaly reflect systemic venous congestion, which is RIGHT-sided HF."},
+{t:"A",q:"A patient's EDV is 120 mL and ESV is 84 mL. What is the ejection fraction, and how is it interpreted?",o:["30%, consistent with HFrEF (systolic HF)","70%, which is normal","36%, consistent with HFpEF","50%, borderline normal"],a:0,r:"SV = 120 − 84 = 36 mL. EF = 36/120 = 30%. An EF under 40% is reduced (HFrEF), a pumping problem."},
+{t:"J",q:"A patient admitted with dyspnea has a BNP of 860 pg/mL. What is the best interpretation?",o:["The ventricles are significantly stretched, consistent with heart failure, and a higher BNP signals a poorer prognosis","Normal; BNP should be above 800","It confirms an acute MI","It indicates dehydration"],a:0,r:"BNP is released by stretched ventricles, and normal is generally under 100 pg/mL. Higher levels correlate with worse cardiac health and survival."},
+];
+
+const TEST2 = [
+{t:"A",q:"A patient's cardiac output is 6 L/min and heart rate is 100 bpm. What is the stroke volume?",o:["60 mL","600 mL","6 mL","16.7 mL"],a:0,r:"SV = CO ÷ HR = 6,000 mL/min ÷ 100 = 60 mL per beat."},
+{t:"A",q:"Which patient has the LOWEST cardiac output?",o:["HR 120, SV 35 mL","HR 60, SV 80 mL","HR 90, SV 60 mL","HR 75, SV 70 mL"],a:0,r:"Calculated CO: 120×35 = 4.2 L, 60×80 = 4.8 L, 90×60 = 5.4 L, 75×70 = 5.25 L. A fast HR doesn't guarantee a high CO if SV is low."},
+{t:"A",q:"A client's BP is 180/120 mmHg. What is the MAP?",o:["140 mmHg","150 mmHg","130 mmHg","160 mmHg"],a:0,r:"MAP = 120 + (180 − 120)/3 = 120 + 20 = 140 mmHg."},
+{t:"C",q:"A patient receives a rapid 2-liter IV fluid bolus. Which change is expected first?",o:["Increased preload","Decreased preload","Decreased afterload only","Decreased contractility"],a:0,r:"More volume returning to the heart means more end-diastolic volume and pressure (↑ preload). In a healthy heart, Frank-Starling increases SV. In a failing heart, it may cause congestion."},
+{t:"C",q:"A hypertensive patient is given a vasodilator that lowers systemic vascular resistance. What effect does this have on the heart?",o:["Afterload decreases, so the LV ejects more easily and workload and O₂ demand fall","Afterload increases, raising workload","Preload increases sharply","Contractility decreases"],a:0,r:"Lower SVR means lower afterload. The ventricle meets less resistance, so less work is needed to eject the same SV. This is why afterload reduction helps HTN and HF."},
+{t:"J",q:"A patient in septic shock has widespread vasodilation, BP 82/44, and HR 128. Which interpretation is correct?",o:["Very low SVR is lowering MAP, and the tachycardia is a compensatory attempt to keep up CO","SVR is elevated, causing the hypotension","The tachycardia is causing the vasodilation","Afterload is increased"],a:0,r:"BP ≈ CO × SVR. With massive vasodilation (↓ SVR), BP falls, and baroreceptors trigger the SNS to raise HR to keep up CO and perfusion."},
+{t:"C",q:"Which statement about preload and afterload is correct?",o:["They are independent; one patient can have both elevated at the same time","They are opposites, so when one rises the other must fall","Afterload is the volume in the ventricle at end-diastole","Preload is the resistance the ventricle pumps against"],a:0,r:"'NOT opposites!' A patient with HTN (↑ afterload) and fluid overload (↑ preload) has both elevated. Preload is filling volume and pressure; afterload is ejection resistance."},
+{t:"A",q:"A 67-year-old's BP is 118/78 mmHg. How is this classified?",o:["Normal","Elevated","Stage 1 hypertension","Stage 2 hypertension"],a:0,r:"Normal is SBP under 120 AND DBP under 80. Age doesn't change the category thresholds."},
+{t:"C",q:"A 45-year-old Black man with a family history of HTN smokes, has a BMI of 32, and eats a high-sodium diet. Which of his risk factors are NON-modifiable? (Select all that apply.)",o:["Family history","Race","Age","Smoking","BMI of 32","High-sodium diet"],a:[0,1,2],r:"Age, family history, and race can't be changed. Smoking, weight, and sodium intake are modifiable and should be the focus of teaching."},
+{t:"J",q:"A client asks why the provider wants home BP readings for two weeks before deciding on treatment. What is the best response?",o:["\"Hypertension is diagnosed from a pattern of sustained readings, and home readings help rule out 'white coat' elevation.\"","\"The provider doesn't trust the clinic's equipment.\"","\"One reading is always enough; this is just extra paperwork.\"","\"Home readings are only needed if you have chest pain.\""],a:0,r:"HTN is a sustained elevation, diagnosed over multiple visits or with continuous or ambulatory monitoring. Anxiety in the clinic can activate the SNS and raise a single reading."},
+{t:"C",q:"How does a high-sodium diet raise blood pressure?",o:["Sodium causes water retention, increasing blood volume, preload, SV, and CO","Sodium directly dilates arteries","Sodium lowers heart rate","Sodium decreases blood volume"],a:0,r:"Water follows sodium, so circulating volume rises. That increases venous return (preload) and CO, and BP ≈ CO × SVR rises."},
+{t:"J",q:"A client has renal artery stenosis and new, difficult-to-control hypertension. What is the best pathophysiologic explanation?",o:["Reduced renal perfusion triggers renin release, activating RAAS and causing vasoconstriction plus Na⁺ and water retention","The kidneys excrete too much sodium","The narrowed artery lowers renin release","Renal stenosis decreases SNS activity"],a:0,r:"The kidney 'senses' low pressure, assumes the body is hypotensive, and releases renin. Angiotensin II (↑ SVR) and aldosterone (↑ volume) then drive BP up."},
+{t:"C",q:"Why is hypertension often called a 'silent killer'?",o:["Vessel and target-organ damage happens gradually, often before any symptoms appear","It always causes severe headaches","It only affects people with symptoms","It cannot be measured"],a:0,r:"Shear stress, endothelial injury, and atherosclerosis progress over years without symptoms. The first sign may be an MI, stroke, HF, or kidney disease."},
+{t:"C",q:"Which factors directly injure the arterial endothelium and promote atherosclerosis? (Select all that apply.)",o:["Hypertension (shearing force)","Cigarette smoking","Hyperlipidemia","Diabetes mellitus","Regular aerobic exercise"],a:[0,1,2,3],r:"HTN, smoking, high lipids, and hyperglycemia all damage the endothelium, causing inflammation and plaque formation. Exercise improves endothelial function."},
+{t:"J",q:"A client asks, 'If I quit smoking, will it really help my heart, or is the damage already done?' Which response best reflects the pathophysiology?",o:["\"Quitting quickly reduces the stimulation that raises your heart rate and BP, and lowers how easily your blood clots, which lowers your risk.\"","\"The damage is permanent, so quitting won't help.\"","\"Smoking only affects your lungs.\"","\"Quitting will raise your blood pressure permanently.\""],a:0,r:"Many smoking effects are reversible: SNS stimulation and pro-thrombotic changes (platelet aggregation and adhesiveness, viscosity) improve after quitting, lowering MI risk."},
+{t:"J",q:"A client with severe uncontrolled HTN but only mild CAD reports exertional angina. Which explanation is most likely?",o:["High afterload and LV hypertrophy increase myocardial O₂ demand beyond what the coronaries supply","Hypertension improves coronary blood flow","LVH lowers O₂ needs","Angina in this client must be from the lungs"],a:0,r:"A thickened LV working against high afterload needs more O₂, and hypertrophied muscle has relatively poorer coronary circulation. Supply and demand become mismatched even with modest CAD."},
+{t:"A",q:"An S4 is produced by the atrial kick pushing blood into a stiff ventricle. In which patient would an S4 NOT be expected?",o:["A patient in atrial fibrillation (no coordinated atrial contraction)","A patient with long-standing HTN and LVH","An elderly patient with HFpEF","A patient with a stiff, hypertrophied ventricle"],a:0,r:"An S4 requires an effective atrial kick. In atrial fibrillation the atria quiver instead of contracting, so there's no kick and no S4."},
+{t:"C",q:"Which event most often converts stable CAD into acute coronary syndrome?",o:["Rupture of an atherosclerotic plaque with thrombus formation","Gradual, stable growth of a fatty streak","A temporary drop in heart rate","Mild dehydration"],a:0,r:"An unstable plaque ruptures and exposes thrombogenic material. Platelets aggregate and a clot forms, suddenly reducing or blocking coronary flow (UA, NSTEMI, or STEMI)."},
+{t:"C",q:"A young adult using cocaine develops chest pain and ST changes despite having no plaque. Which supply-and-demand mechanism best explains this?",o:["Coronary vasospasm, which decreases supply","Decreased heart rate, which lowers demand","Decreased contractility","Fixed atherosclerotic stenosis"],a:0,r:"Vasospasm suddenly narrows the coronary arteries (↓ supply). Cocaine also raises HR and BP (↑ demand), but the spasm alone can cause ischemia even in clean arteries."},
+{t:"J",q:"A patient with known CAD has a fever of 39.4 °C (103 °F), HR 132, and new chest pressure. What best explains the new chest pain?",o:["Fever and tachycardia raise myocardial O₂ demand and shorten diastolic coronary filling","Fever directly ruptures plaques","Tachycardia improves coronary supply","The pain is unrelated to the heart"],a:0,r:"Fever increases metabolic demand, and tachycardia increases cardiac work while shortening diastole, when coronaries fill. With fixed stenoses, supply can't keep up, causing ischemia."},
+{t:"J",q:"The nurse receives report on four patients. Whom should the nurse see FIRST?",o:["A 68-year-old woman with nausea, diaphoresis, and jaw discomfort for 40 minutes","A client with BP 148/92 and no symptoms","A client with chronic HF and stable 1+ ankle edema","A client whose stable angina resolved with rest 2 hours ago"],a:0,r:"Her atypical symptoms (nausea, diaphoresis, jaw pain) suggest an active MI, an unstable, time-sensitive emergency. The others are stable."},
+{t:"C",q:"Which feature best differentiates MI chest pain from stable angina?",o:["MI pain is persistent and not relieved by rest","MI pain always occurs only with exercise","Stable angina lasts for hours","MI pain is always mild"],a:0,r:"Stable angina is predictable and resolves with rest. MI pain is sudden, severe, and persistent because the tissue is dying, not just temporarily ischemic."},
+{t:"J",q:"A patient's 12-lead ECG shows new ST elevation in several contiguous leads. How should the nurse interpret this?",o:["Acute myocardial injury (STEMI), an emergency requiring rapid reperfusion","A normal variant needing no action","Stable angina","Evidence of heart failure only"],a:0,r:"ST elevation reflects acute transmural injury, meaning an occluded coronary artery. Time is muscle, so activate the cardiac team per protocol."},
+{t:"J",q:"A patient with chest pain has a normal ECG, but the 6-hour troponin is elevated. What is the best interpretation?",o:["Myocardial injury has occurred (e.g., NSTEMI); a normal ECG doesn't rule out MI","No MI occurred because the ECG is normal","The troponin is a false positive","The patient has a hypertensive crisis"],a:0,r:"MI diagnosis uses three findings. An MI can occur without ST elevation (NSTEMI), and the elevated cardiac-specific troponin shows myocyte damage."},
+{t:"A",q:"After an MI, troponin results are 0.8 at 12 hours and 4.2 at 30 hours, then lower at 72 hours. How should this pattern be interpreted?",o:["An expected pattern: troponin peaks at 24–48 hours and then declines","Reinfarction at 72 hours","Lab error, because troponin never peaks","Troponin should be highest at 1–2 hours"],a:0,r:"Troponin is detectable at 3–12 hrs, peaks at 24–48 hrs, and returns to baseline over 5–14 days. A rise then a fall after the peak is the classic MI pattern."},
+{t:"J",q:"On day 4 after an MI, a patient has new chest pain. Troponin is still elevated from the first MI. Which marker helps most to detect a reinfarction?",o:["CK-MB, because it returns to baseline in 48–72 hours, so a new rise suggests new injury","Troponin, because it would be normal by day 4","Myoglobin, because it stays elevated for 2 weeks","BNP"],a:0,r:"Troponin stays elevated for 5–14 days, so it can't easily show new injury. CK should be back to baseline by day 3, so a new CK rise points to reinfarction."},
+{t:"C",q:"Why does necrosis after an MI lead to impaired contractility?",o:["Dead myocytes can't contract and are replaced by non-contractile scar tissue","Necrotic tissue contracts more strongly","Necrosis only affects the valves","Scar tissue conducts impulses faster"],a:0,r:"Infarcted muscle becomes fibrous scar. A large infarct means less functional muscle, so ↓ contractility, ↓ SV, ↓ EF, and risk of HF."},
+{t:"J",q:"A post-MI patient's monitor shows frequent PVCs. Why does this patient need continuous cardiac monitoring?",o:["Ischemic myocardium is electrically unstable and can progress to lethal ventricular dysrhythmias","PVCs are always harmless after MI","Monitoring is only needed for blood pressure","Electrical instability affects only the atria"],a:0,r:"Injured cells with K⁺ leak and altered membrane potentials are irritable. Electrical instability is a major early MI complication and a leading cause of sudden death."},
+{t:"J",q:"Three days after an inferior MI, a patient develops a sudden new systolic murmur and acute pulmonary edema. What is the most likely cause?",o:["Papillary muscle dysfunction or rupture from necrosis, causing acute mitral regurgitation","Mitral stenosis from rheumatic fever","Aortic stenosis from wear and tear","Hypertensive retinopathy"],a:0,r:"MI is a listed cause of regurgitation. Necrosis of a papillary muscle stops the mitral valve from closing, so blood floods back into the LA and lungs (a systolic murmur and acute pulmonary edema)."},
+{t:"C",q:"In mitral stenosis, which consequence is expected?",o:["Blood backs up in the left atrium, causing LA enlargement and pulmonary congestion","The LV is overfilled during diastole","Blood leaks from the aorta back into the LV","Right atrial pressure falls"],a:0,r:"A narrowed mitral valve impedes LA-to-LV filling during diastole (a diastolic murmur). LA pressure rises, the atrium dilates (risking atrial fibrillation), and pressure transmits to the lungs."},
+{t:"C",q:"In aortic regurgitation, blood flows back from the aorta into the LV during diastole. Over time, what happens to the LV?",o:["Volume overload (↑ preload) leads to dilation","The LV shrinks","Preload decreases","There is no effect on the LV"],a:0,r:"The LV receives normal atrial filling PLUS backflow from the aorta, a chronic volume overload. It responds with dilation (eccentric remodeling) and can eventually fail."},
+{t:"J",q:"A patient has a systolic murmur at the left sternal border, JVD, and peripheral edema. Which valve disorder fits best?",o:["Tricuspid regurgitation","Mitral stenosis","Aortic regurgitation","Pulmonic regurgitation"],a:0,r:"Tricuspid regurgitation is a systolic murmur: blood leaks back into the RA during RV contraction, raising systemic venous pressure (JVD, edema)."},
+{t:"J",q:"A patient being treated for infective endocarditis develops a new murmur. What does this most likely indicate?",o:["Valve damage from the infection causing regurgitation","Normal response to antibiotics","Mitral stenosis from aging","Improved valve function"],a:0,r:"Endocarditis vegetations can destroy valve leaflets so they don't close (regurgitation). A new murmur in endocarditis is significant and should be reported."},
+{t:"C",q:"Which valve disorders produce a SYSTOLIC murmur? (Select all that apply.)",o:["Aortic stenosis","Pulmonic stenosis","Mitral regurgitation","Tricuspid regurgitation","Mitral stenosis","Aortic regurgitation"],a:[0,1,2,3],r:"During systole, the semilunar valves should be open and the AV valves closed. So semilunar stenosis (AS, PS) and AV regurgitation (MR, TR) produce systolic murmurs."},
+{t:"C",q:"The Frank-Starling mechanism helps the failing heart at first. Why does it eventually fail?",o:["Overstretched fibers lose their optimal overlap, so contraction weakens and CO falls","Stretch always makes contraction stronger without limit","The heart stops filling","Preload drops to zero"],a:0,r:"Within normal limits, more stretch gives a stronger contraction. In chronic dilation, fibers are overstretched and the curve flattens or declines, so more volume no longer raises SV."},
+{t:"C",q:"Which consequences of ventricular hypertrophy should the nurse anticipate? (Select all that apply.)",o:["Impaired ventricular filling","Higher myocardial O₂ needs","Poor coronary artery circulation","Risk for ventricular dysrhythmias","Improved ventricular compliance"],a:[0,1,2,3],r:"A thick wall is stiff (worse filling), has more muscle to feed (↑ O₂ need), is harder to perfuse, and is electrically irritable. Compliance DEcreases."},
+{t:"C",q:"Which findings indicate RIGHT-sided heart failure? (Select all that apply.)",o:["Jugular venous distension","Hepatosplenomegaly","Dependent pitting edema","Weight gain","Cough with pink frothy sputum"],a:[0,1,2,3],r:"RV failure causes blood to back up into the systemic veins: JVD, an enlarged liver and spleen, edema, and fluid weight. Frothy sputum reflects pulmonary edema from LEFT HF."},
+{t:"C",q:"What is the most common cause of right-sided heart failure, and why?",o:["Left-sided HF: pulmonary congestion raises pulmonary pressures, increasing RV afterload","Systemic hypertension directly affecting the RV","Aortic stenosis","Dehydration"],a:0,r:"When the LV fails, blood backs up into the lungs, raising pulmonary pressure. The RV must pump against that higher pressure and eventually fails too. This is why most patients have both."},
+{t:"J",q:"An 81-year-old woman with long-standing HTN has dyspnea, an S4, concentric LVH on echo, and an EF of 62%. Which type of HF is most likely?",o:["HFpEF (diastolic HF)","HFrEF (systolic HF)","No HF, because EF is normal","Isolated right-sided HF from tricuspid stenosis"],a:0,r:"She fits the classic HFpEF picture: elderly, female, HTN leading to concentric hypertrophy and a stiff ventricle, an S4 ('a-STIFF-wall'), and a preserved EF over 50%. A normal EF doesn't rule out HF."},
+{t:"J",q:"A 58-year-old man 1 year after a large MI has a dilated LV, an S3, and an EF of 28%. Which type of HF is most likely?",o:["HFrEF (systolic HF)","HFpEF (diastolic HF)","Normal heart function","Hypertensive crisis"],a:0,r:"After an MI, the heart loses contractile muscle, leading to eccentric remodeling and dilation, an S3 ('SLOSH-ing-in'), and an EF under 40%. The problem is pumping."},
+{t:"C",q:"A patient with HF symptoms has an EF of 55%. Which statement is correct?",o:["The EF is preserved; the patient may have HFpEF, a filling problem","The patient can't have HF with a normal EF","An EF of 55% indicates HFrEF","An EF of 55% means the patient is hypovolemic"],a:0,r:"Normal EF is about 50–70%. In HFpEF the ventricle ejects a normal percentage of a SMALL filling volume, so the total SV can still be inadequate."},
+{t:"J",q:"The nurse hears an S3 in a patient with HF. What does this most likely suggest?",o:["Volume overload and/or poor systolic function; assess fluid status (crackles, weight, JVD)","An expected finding in all healthy older adults","A stiff ventricle with a forceful atrial kick","Hypovolemia"],a:0,r:"An S3 is an early-diastolic sound as blood rushes into an overfilled ventricle. In adults with HF it signals volume overload or HFrEF, so look for other signs of congestion."},
+{t:"C",q:"BNP is secreted from which structure, and what stimulates its release?",o:["The ventricles, in response to stretch","The atria, in response to dehydration","The kidneys, in response to low BP","The liver, in response to MI"],a:0,r:"BNP comes from the ventricles and ANP from the atria. Both are released when chamber walls are stretched by volume or pressure overload."},
+{t:"J",q:"A patient admitted with decompensated HF had a BNP of 1,200 pg/mL. At discharge it is 400 pg/mL. What is the best interpretation?",o:["Ventricular stretch has decreased, showing improvement, though BNP is still above normal","The patient's HF has worsened","BNP of 400 is normal","BNP trends have no clinical meaning"],a:0,r:"Falling BNP means less ventricular wall stretch, so treatment is working. It's still above the general normal (under 100), reflecting ongoing chronic HF."},
+{t:"J",q:"A patient presents with acute dyspnea. BNP is 65 pg/mL. What should the nurse anticipate?",o:["Heart failure is less likely to be the cause; other causes (e.g., pulmonary) should be considered","HF is confirmed","An MI is confirmed","The patient needs immediate treatment for HFrEF"],a:0,r:"BNP under 100 pg/mL is generally normal. A low BNP in a dyspneic patient makes cardiac stretch an unlikely cause and points toward non-cardiac causes."},
+{t:"C",q:"Which findings indicate decompensating heart failure? (Select all that apply.)",o:["Increasing dyspnea and orthopnea","Rapid weight gain","New or worsening crackles","Pink frothy sputum","Increasing JVD","Improved exercise tolerance"],a:[0,1,2,3,4],r:"Decompensation means compensation has failed. Watch for worsening congestion in the lungs (dyspnea, crackles, frothy sputum) and in the system (weight gain, JVD, edema)."},
+{t:"C",q:"What causes pulmonary edema in acute left-sided HF?",o:["↑ LV filling pressure backs up into pulmonary capillaries, pushing fluid into the alveoli and impairing gas exchange","Bacteria fill the alveoli","Low pulmonary pressures pull fluid out of the lungs","Right ventricular failure decreases lung fluid"],a:0,r:"A failing LV can't empty, so LA pressure rises, then pulmonary venous and capillary hydrostatic pressure rise. Fluid leaks into the interstitium and alveoli, causing crackles, hypoxemia, and frothy sputum."},
+{t:"J",q:"A patient with HF suddenly develops severe dyspnea, pink frothy sputum, and SpO₂ of 84%. What is the nurse's FIRST action?",o:["Place the patient in high Fowler's position and apply oxygen, then notify the provider","Lay the patient flat to rest","Encourage oral fluids","Obtain a dietary history"],a:0,r:"This is acute pulmonary edema, an airway and breathing priority. Sitting upright reduces venous return (preload) and improves lung expansion, and oxygen treats the hypoxemia. Then escalate."},
+{t:"A",q:"A patient's end-diastolic volume is 150 mL and stroke volume is 90 mL. What is the ejection fraction, and how is it interpreted?",o:["60%, within normal range","40%, reduced","90%, abnormally high","167%, calculation impossible"],a:0,r:"EF = SV ÷ EDV = 90/150 = 60%. Normal EF is about 50–70%. ESV would be 150 − 90 = 60 mL."},
+{t:"A",q:"While auscultating a client with 20 years of poorly controlled HTN, the nurse hears a low-pitched sound just before S1. How should this be interpreted?",o:["An S4 from the atrial kick pushing blood into a stiff, hypertrophied ventricle (diastolic dysfunction)","An S3 from volume overload in a dilated ventricle","A diastolic murmur from aortic regurgitation","A normal finding in all adults"],a:0,r:"An S4 is late diastolic (just before S1). Chronic HTN causes concentric LVH, a stiff wall that resists filling, so the atrial kick produces an S4. This is a cue for HFpEF risk."},
+];
+
+const TEST3 = [
+{t:"A",q:"<b>Case: Mr. J.</b> A 52-year-old man has BP readings of 168/104, 164/100, and 170/106 over three visits. He smokes, has a BMI of 34, and eats fast food daily. How is his BP classified?",o:["Stage 2 hypertension","Stage 1 hypertension","Elevated","Hypertensive crisis"],a:0,r:"SBP of 140 or above OR DBP of 90 or above is Stage 2. It isn't a crisis, which requires over 180 and/or over 120. It was confirmed across multiple visits."},
+{t:"J",q:"<b>Mr. J.</b> Which findings indicate he ALREADY has target organ damage? (Select all that apply.)",o:["Left ventricular hypertrophy on echocardiogram","Protein in his urine","Narrowed retinal arterioles on eye exam","BMI of 34","Smoking 1 pack per day"],a:[0,1,2],r:"LVH (heart), proteinuria (kidney), and retinal changes (eye) are organ damage. BMI and smoking are risk factors, not damage."},
+{t:"C",q:"<b>Mr. J.</b> His echo shows concentric LVH. What is the primary reason it developed?",o:["Chronic increased afterload forced the LV to generate more pressure, thickening the wall","Chronic low blood volume","Mitral regurgitation","Decreased SNS activity"],a:0,r:"A pressure overload (HTN means ↑ afterload) causes concentric hypertrophy: a thicker wall with a smaller cavity. This sets the stage for HFpEF."},
+{t:"J",q:"<b>Mr. J.</b> He says, \"I feel completely fine, so my blood pressure can't be hurting anything.\" What is the nurse's best response?",o:["\"High blood pressure often damages vessels and organs silently; your heart, kidneys, and eyes already show some effects.\"","\"You're right; if you have no symptoms, there is no damage.\"","\"You only need treatment once you get headaches.\"","\"Your BP will normalize on its own.\""],a:0,r:"HTN is usually asymptomatic while it damages the endothelium and target organs. Connecting his own findings (LVH, proteinuria) to the teaching makes it meaningful."},
+{t:"C",q:"<b>Mr. J.</b> Which teaching explains how reducing dietary sodium will lower his BP?",o:["Less sodium means less water retention, so lower blood volume, preload, and CO, and lower BP","Less sodium increases heart rate","Sodium has no effect on fluid balance","Less sodium increases SVR"],a:0,r:"Water follows sodium. Lower volume reduces venous return and CO, which lowers BP. It also reduces the workload on his hypertrophied LV."},
+{t:"J",q:"<b>Mr. J.</b> Three years later he arrives with BP 214/128, severe headache, and new confusion. How should the nurse interpret this?",o:["Hypertensive crisis with signs of brain target-organ involvement, which needs emergency care","Stage 2 hypertension; schedule a follow-up visit","Expected after missing one medication dose; no action needed","Right-sided heart failure"],a:0,r:"Over 180 and/or over 120 is a crisis. Headache and confusion suggest cerebral involvement (e.g., hypertensive encephalopathy or stroke). Notify the provider immediately."},
+{t:"J",q:"<b>Case: Ms. L.</b> A 66-year-old woman with type 2 diabetes reports 2 hours of fatigue, epigastric 'indigestion,' and shortness of breath. Vitals: BP 142/88, HR 104, SpO₂ 94%. What is the nurse's PRIORITY action?",o:["Obtain a 12-lead ECG","Give an antacid and reassess in an hour","Schedule an outpatient GI referral","Teach about diabetic diet"],a:0,r:"Women, older adults, and people with diabetes often have atypical MI symptoms. A 12-lead ECG is the fastest diagnostic step, and assuming it's GI could delay life-saving care."},
+{t:"C",q:"<b>Ms. L.</b> Why is she more likely than a younger man to present without classic crushing chest pain?",o:["Diabetes, older age, and female sex are associated with atypical MI presentations (e.g., altered pain perception from diabetic neuropathy)","Women never have chest pain during MI","Diabetes prevents MIs","Atypical symptoms mean the MI is less serious"],a:0,r:"About 1 in 5 MIs are atypical. Diabetic autonomic neuropathy can blunt pain signals. Atypical doesn't mean less dangerous, and these patients often have worse outcomes because of delays."},
+{t:"C",q:"<b>Ms. L.</b> Her ECG shows ST elevation in leads V1–V4. At the cellular level, what does this reflect?",o:["Ischemic cells lack ATP and leak K⁺, so injured and healthy tissue depolarize and repolarize differently","Atrial depolarization is delayed","Her ventricles are repolarizing normally","She has valve regurgitation"],a:0,r:"ST elevation is the electrical signature of acute injury. ATP depletion causes K⁺ leak, creating a current between injured and healthy myocardium, which is seen on the ECG."},
+{t:"J",q:"<b>Ms. L.</b> Her first troponin, drawn 2 hours after symptom onset, is within normal limits. What should the nurse do?",o:["Recognize that troponin may not rise for 3–12 hours, follow the ECG findings, and obtain serial troponins","Conclude no MI occurred and prepare for discharge","Stop cardiac monitoring","Order a BNP to rule out MI"],a:0,r:"An early normal troponin does not rule out MI, and her ECG already shows STEMI. Treat based on the ECG and trend troponins per protocol."},
+{t:"C",q:"<b>Ms. L.</b> After the MI, her BP drops to 88/56 and HR rises to 118. Which explanation is best?",o:["Damaged myocardium has reduced contractility, so SV and BP fall, and the SNS compensates by raising HR","Her afterload has increased dramatically","She is hypervolemic","The tachycardia is causing the MI"],a:0,r:"Infarcted muscle pumps poorly, so ↓ SV and ↓ CO, and BP falls. Baroreceptors trigger the SNS, causing tachycardia (positive chronotropy) to try to keep CO up."},
+{t:"J",q:"<b>Ms. L.</b> Why is her tachycardia of 118 potentially harmful to her heart?",o:["It increases myocardial O₂ demand and shortens diastolic coronary filling, which could extend the infarct","It improves coronary perfusion","It lowers O₂ demand","It has no effect on ischemic tissue"],a:0,r:"Compensation turns harmful: the at-risk myocardium around the infarct needs more O₂ but gets less filling time. The supply-demand mismatch can enlarge the infarct."},
+{t:"J",q:"<b>Ms. L.</b> On day 2, she suddenly develops severe dyspnea, crackles to mid-lung fields, and a new loud systolic murmur at the apex. What is the most likely complication?",o:["Acute mitral regurgitation from papillary muscle necrosis","Mitral stenosis from rheumatic fever","Aortic regurgitation from endocarditis","Stable angina"],a:0,r:"MI necrosis can affect a papillary muscle, so the mitral valve can't close and blood regurgitates into the LA during systole. This causes a new systolic murmur and acute pulmonary edema."},
+{t:"J",q:"<b>Ms. L.</b> Which monitoring is the highest priority during the first 48 hours after her MI?",o:["Continuous ECG monitoring for dysrhythmias","Weekly weights","Annual lipid panels","Monthly BNP"],a:0,r:"Electrical instability is a leading cause of early death after MI. Continuous telemetry allows immediate recognition of VT or VF."},
+{t:"C",q:"<b>Case: Mrs. Smith.</b> A 72-year-old woman has HTN, hyperlipidemia, and an MI 10 years ago treated with two stents. She has a year of worsening exertional dyspnea, now sleeps on several pillows, and has had foot swelling for 2 weeks. Exam: tachypnea, bibasilar crackles, cool skin, 2+ pitting pedal edema. CXR: lower-lung fluid and LV and RV hypertrophy. What was the FIRST step in her pathophysiology 10 years ago?",o:["The MI caused myocardial necrosis and scarring, reducing contractility","Right ventricular failure caused the MI","Pulmonary edema caused the MI","The stents caused heart failure"],a:0,r:"Her MI killed myocardium, which was replaced by non-contractile scar. That meant ↓ contractility and ↓ SV, triggering compensation (SNS, RAAS, remodeling) that eventually failed."},
+{t:"C",q:"<b>Mrs. Smith.</b> How did her HTN and hyperlipidemia contribute to her current condition?",o:["Hyperlipidemia promoted atherosclerosis (CAD leading to MI), and HTN increased afterload, driving hypertrophy and more workload","They have no relationship to heart failure","HTN reduced her afterload","Hyperlipidemia only affects the liver"],a:0,r:"Hyperlipidemia (plus HTN shear injury) leads to coronary plaque and her MI. Chronic HTN means ↑ afterload, causing LV hypertrophy, a stiff wall, ↑ O₂ demand, and progression of HF."},
+{t:"J",q:"<b>Mrs. Smith.</b> She has begun sleeping on several pillows. What does this finding indicate?",o:["Orthopnea from pulmonary congestion (left-sided HF)","Peripheral edema from right-sided HF","Normal aging","Neck pain"],a:0,r:"Lying flat increases venous return to an already-congested pulmonary circulation, worsening dyspnea. Sitting up relieves it. Orthopnea is a classic left-HF finding."},
+{t:"C",q:"<b>Mrs. Smith.</b> Her foot swelling began only 2 weeks ago, after a year of dyspnea. What best explains this timeline?",o:["Long-standing left HF raised pulmonary pressures, eventually causing right HF and systemic venous congestion","She developed isolated right HF from a new cause","The edema is unrelated to her heart","Her left HF has resolved"],a:0,r:"Left HF came first (dyspnea, orthopnea). Chronic pulmonary congestion ↑ RV afterload, so the RV failed, causing peripheral edema. Left HF is the most common cause of right HF."},
+{t:"C",q:"<b>Mrs. Smith.</b> Why is her skin cool?",o:["↓ CO triggers SNS vasoconstriction, shunting blood away from the skin to vital organs","She has a fever","Increased cardiac output to the skin","Hypertensive crisis"],a:0,r:"With low CO, the SNS constricts peripheral vessels to keep up BP and perfusion to the brain and heart. Cool skin is a perfusion cue, and the vasoconstriction also ↑ afterload."},
+{t:"C",q:"<b>Mrs. Smith.</b> Her CXR shows LV and RV hypertrophy. This is best described as:",o:["A compensatory mechanism (remodeling) that eventually impairs filling and raises O₂ demand","A sign her heart has fully recovered","Unrelated to HF","Evidence of hypovolemia"],a:0,r:"Hypertrophy is the heart's response to chronic overload. It initially maintains output, but the thick walls fill poorly, need more O₂, are poorly perfused, and are prone to dysrhythmias."},
+{t:"J",q:"<b>Mrs. Smith.</b> Which additional findings would the nurse expect on further assessment? (Select all that apply.)",o:["Jugular venous distension","Elevated BNP","Hepatomegaly","An extra heart sound (S3 or S4)","Bradycardia with warm, flushed skin"],a:[0,1,2,3],r:"Biventricular HF produces systemic congestion (JVD, hepatomegaly), ventricular stretch (↑ BNP), and gallops. The SNS-driven picture is tachycardia with cool skin, not bradycardia with warm skin."},
+{t:"J",q:"<b>Mrs. Smith.</b> Which lab test is MOST useful to support a diagnosis of heart failure and track her progress?",o:["BNP or NT-proBNP","Troponin","Myoglobin","CK-MB"],a:0,r:"Natriuretic peptides reflect ventricular stretch: they diagnose HF and track response and prognosis. Troponin, CK, and myoglobin are MI markers."},
+{t:"J",q:"<b>Mrs. Smith.</b> Her echo shows a dilated LV with an EF of 35%. Which heart sound is most consistent with this?",o:["S3, an early-diastolic sound from blood entering an overfilled ventricle","S4 only","No extra heart sounds","A diastolic murmur from mitral stenosis"],a:0,r:"An EF under 40% is HFrEF, with a dilated, volume-overloaded ventricle. That means an S3 ('SLOSH-ing-in'). This fits her prior MI (loss of contractile muscle)."},
+{t:"C",q:"<b>Mrs. Smith.</b> Why is she tachypneic?",o:["Fluid in the alveoli impairs gas exchange and reduces lung compliance, so she breathes faster","Her lungs are hyperinflated from asthma","She is anxious only","Low preload"],a:0,r:"Pulmonary edema thickens the alveolar-capillary barrier (↓ O₂ diffusion) and stiffens the lungs. Hypoxemia and the work of breathing drive tachypnea."},
+{t:"J",q:"<b>Mrs. Smith.</b> Which nursing priority is MOST important right now?",o:["Impaired gas exchange related to pulmonary congestion","Knowledge deficit about stent care","Risk for constipation","Disturbed body image related to edema"],a:0,r:"Use ABCs. Crackles, tachypnea, and fluid on CXR mean oxygenation is the immediate threat. Teaching and comfort issues come after she is stabilized."},
+{t:"J",q:"<b>Mrs. Smith.</b> After 3 days of treatment, which findings indicate her HF is improving? (Select all that apply.)",o:["Crackles are decreased","Weight is down 2.5 kg from admission","BNP is trending down","She can sleep with one pillow","New S3 and increased JVD"],a:[0,1,2,3],r:"Less pulmonary congestion (fewer crackles, less orthopnea), fluid loss (weight), and less ventricular stretch (↓ BNP) all show improvement. A new S3 and more JVD would mean worsening."},
+{t:"J",q:"<b>Mrs. Smith.</b> After discharge, she reports a 2 kg (4.4 lb) weight gain over 2 days. How should the nurse interpret this?",o:["Likely fluid retention and early decompensation, so the provider should be notified","Normal fat gain from improved appetite","Expected and harmless","A sign her EF has improved"],a:0,r:"Rapid weight gain in HF reflects fluid, not fat (1 L of fluid ≈ 1 kg). It often comes before obvious dyspnea and edema, so it is an early warning of decompensation."},
+{t:"J",q:"<b>Case: Mr. R.</b> A 79-year-old has had two near-syncopal episodes while gardening, plus exertional chest pressure. A harsh crescendo-decrescendo systolic murmur is heard at the right upper sternal border. What is the most likely diagnosis?",o:["Aortic stenosis","Mitral stenosis","Aortic regurgitation","Tricuspid stenosis"],a:0,r:"Aortic stenosis is a systolic murmur and common in older adults from wear and tear and calcification. Its classic triad is syncope, angina, and dyspnea or HF on exertion."},
+{t:"C",q:"<b>Mr. R.</b> Why does he become lightheaded during exertion?",o:["The fixed valve obstruction prevents CO from rising to meet demand, so cerebral perfusion falls","Exercise always lowers CO in healthy people","His preload is too high","His heart rate is too slow from exercise"],a:0,r:"During exercise, peripheral vessels dilate. A healthy heart raises SV, but a stenotic aortic valve caps outflow, so BP and cerebral perfusion drop, causing presyncope or syncope."},
+{t:"C",q:"<b>Mr. R.</b> Echo shows LV hypertrophy. What best explains this?",o:["The stenotic valve increases afterload, so the LV must generate higher pressures","Volume overload from aortic regurgitation","Low blood pressure","Right-sided HF"],a:0,r:"Aortic stenosis is a pressure overload, like HTN, causing concentric LVH. The thick LV needs more O₂, which explains his angina even if his coronaries are fine."},
+{t:"J",q:"<b>Case: Ms. T.</b> A 41-year-old with a history of rheumatic fever as a child has progressive dyspnea, a new irregularly irregular pulse, and a low-pitched diastolic rumble at the apex. Which finding best explains her irregular rhythm?",o:["Mitral stenosis has enlarged the left atrium, predisposing her to atrial fibrillation","Aortic stenosis","Normal sinus arrhythmia","Pulmonic regurgitation"],a:0,r:"Rheumatic fever scars the mitral valve. Stenosis means a diastolic murmur and raised LA pressure. The LA dilates, its electrical stability falls, and atrial fibrillation develops."},
+{t:"J",q:"A patient is actively bleeding after trauma. Which compensatory responses does the nurse expect? (Select all that apply.)",o:["Tachycardia","Peripheral vasoconstriction (cool, pale skin)","Decreased urine output","Activation of RAAS","Bradycardia with warm skin"],a:[0,1,2,3],r:"↓ Preload leads to ↓ SV and ↓ BP. The SNS raises HR and vasoconstriction, and RAAS conserves Na⁺ and water (↓ urine output). Bradycardia and warm skin are not expected compensation."},
+{t:"A",q:"Patient A is receiving a vasoconstrictor infusion (BP 132/80). Patient B has septic vasodilation (BP 84/40). Whose systemic vascular resistance is higher?",o:["Patient A","Patient B","They are equal","SVR can't be estimated from this"],a:0,r:"Vasoconstriction raises SVR (and afterload), and vasodilation lowers it. Patient B's low SVR explains the hypotension."},
+{t:"J",q:"A patient has a HR of 38 bpm, SV 70 mL, BP 84/50, and reports dizziness. What is the best explanation?",o:["CO ≈ 2.7 L/min is too low because the HR is too slow to sustain cardiac output","CO is high, causing dizziness","The stroke volume is the problem","Afterload is too high"],a:0,r:"CO = 70 × 38 ≈ 2.7 L/min, well below normal. Even with a normal SV, a very slow HR can drop CO and BP enough to reduce brain perfusion."},
+{t:"C",q:"A patient with HF and a resting HR of 115 is treated, and the HR falls to 80. The provider says this may IMPROVE cardiac output. Why?",o:["A slower rate lengthens diastole, allowing more filling (↑ preload) and a larger stroke volume, plus better coronary perfusion","Lower HR always lowers CO","Slowing the heart reduces preload","HR has no effect on filling time"],a:0,r:"CO = SV × HR. When tachycardia limits filling, slowing the rate lets SV rise enough to offset the lower HR. It also reduces O₂ demand and improves diastolic coronary flow."},
+{t:"C",q:"A provider orders a medication 'to improve the force of contraction' for a patient with an EF of 20%. Which effect is being sought?",o:["Positive inotropic effect","Positive chronotropic effect","Negative inotropic effect","Increased afterload"],a:0,r:"With a very low EF, contractility is the problem. A positive inotrope raises force, so SV and CO rise. Chronotropy refers to rate."},
+{t:"J",q:"A patient 1 day after an MI is confused, BP 80/52 (MAP 61), HR 122, urine output 15 mL/hr, with cool, clammy skin. What is the most likely problem?",o:["Inadequate cardiac output and organ perfusion from pump failure, an emergency","Expected post-MI fatigue","Hypertensive crisis","Dehydration from NPO status only"],a:0,r:"Confusion (brain), low urine output (kidneys), cool and clammy skin (SNS), and a MAP near 60 are all signs of global hypoperfusion. Damaged myocardium can't sustain CO. Notify immediately."},
+{t:"C",q:"An 82-year-old's BP is 168/72. The nurse knows that loss of arterial elasticity with aging contributes to the high systolic pressure. This process is:",o:["Arteriosclerosis","Atherosclerosis","Endocarditis","Regurgitation"],a:0,r:"Arteriosclerosis is hardening and stiffening of arteries. Stiff vessels can't absorb the systolic surge, so SBP rises (often with a normal DBP). Atherosclerosis specifically refers to fatty plaques."},
+{t:"C",q:"Why is a patient with HFpEF especially intolerant of tachycardia or new atrial fibrillation?",o:["A stiff ventricle needs adequate filling time and the atrial kick to fill, and tachycardia or AF removes both","HFpEF patients have large, floppy ventricles","Tachycardia improves diastolic filling","AF increases atrial kick"],a:0,r:"In HFpEF, filling is the problem. Shorter diastole means less filling. Losing the atrial kick (which 'tops off' a stiff ventricle) further cuts preload, so SV falls."},
+{t:"C",q:"Which features are characteristic of HFrEF? (Select all that apply.)",o:["EF under 40%","Chamber dilation with eccentric remodeling","S3 heart sound","More often male, ages 50–70","Concentric hypertrophy with a small cavity"],a:[0,1,2,3],r:"HFrEF is a pumping problem: dilated ('SLOSH-ing-in'), an S3, often after MI, and more often male. Concentric hypertrophy is characteristic of HFpEF."},
+{t:"C",q:"Natriuretic peptides (ANP, BNP) are released when the heart is stretched. What is their physiologic purpose?",o:["To promote sodium and water excretion and vasodilation, reducing volume and workload","To cause sodium retention","To trigger vasoconstriction","To increase heart rate"],a:0,r:"'Natriuretic' means promoting sodium excretion. These hormones counter RAAS by unloading the heart through diuresis and vasodilation. High levels mean the heart is overstretched."},
+{t:"J",q:"An 80-year-old with dyspnea has an NT-proBNP of 2,400 pg/mL. What is the best interpretation?",o:["Markedly elevated even allowing for age, supporting HF with significant ventricular stretch","Normal for age","Indicates acute MI","Indicates dehydration"],a:0,r:"The general normal is under 300 pg/mL, and age-adjusted cutoffs are higher in older adults. 2,400 is well above them and strongly suggests HF."},
+{t:"J",q:"A clinic patient with chronic HF feels 'about the same,' but BNP has risen from 280 to 650 pg/mL since the last visit. What is the most appropriate interpretation?",o:["Increasing ventricular stretch suggests early worsening; report and reassess the fluid status","Nothing; BNP changes don't matter if the patient feels fine","The patient is improving","The lab result is invalid"],a:0,r:"A rising BNP means more ventricular stretch and a worse prognosis. It may come before symptoms, offering an early window to intervene."},
+{t:"J",q:"The nurse is caring for four patients with HF. Whom should the nurse assess FIRST?",o:["SpO₂ 87%, coughing pink frothy sputum, and anxious","2+ pedal edema, unchanged from yesterday","Weight up 0.3 kg overnight","Requesting education on a low-sodium diet"],a:0,r:"Pink frothy sputum and hypoxemia mean acute pulmonary edema, an airway and breathing emergency. The others are stable or non-urgent."},
+{t:"J",q:"A patient with COPD has JVD, ascites, hepatomegaly, and pedal edema, but clear lung sounds and a normal LV on echo. What is the most likely problem?",o:["Isolated right-sided HF from chronically high pulmonary pressures","Left-sided HF","Acute MI","Mitral stenosis"],a:0,r:"Systemic congestion with clear lungs and a normal LV means the RV is failing alone. Lung disease raises pulmonary vascular resistance (RV afterload), causing isolated right HF."},
+{t:"C",q:"Which sequence best describes how chronic HTN leads to HFpEF?",o:["↑ Afterload → concentric LVH → stiff ventricle with impaired filling → ↑ filling pressures → pulmonary congestion","↑ Afterload → LV dilation → EF of 25%","Dehydration → ↓ preload → HFpEF","Valve regurgitation → ↑ EF → HFpEF"],a:0,r:"Pressure overload thickens the LV. Its walls stiffen (diastolic dysfunction), so it needs higher pressure to fill, and that pressure backs into the lungs. EF stays preserved."},
+{t:"C",q:"Which sequence correctly describes an acute MI from start to lab confirmation?",o:["Plaque rupture → thrombus → ischemia → ↓ ATP → necrosis → troponin released into blood","Troponin release → plaque rupture → ischemia","Necrosis → plaque formation → thrombus","BNP release → thrombus → ischemia"],a:0,r:"An unstable plaque ruptures and a clot occludes the artery. Without O₂ there's no ATP, cells are injured, and they die (necrosis). Damaged myocytes then release troponin."},
+{t:"J",q:"A patient with a heart rate of 188 bpm reports dizziness. BP is 82/50. What best explains the hypotension?",o:["The ventricles have too little time to fill, so stroke volume and cardiac output drop","The fast rate greatly increases cardiac output","Afterload has fallen to zero","Preload is increased"],a:0,r:"At very fast rates, diastolic filling time collapses (↓ preload, then ↓ SV), so CO and BP fall. Coronary perfusion also suffers. Dizziness reflects reduced cerebral perfusion."},
+{t:"J",q:"After teaching, which statement by a newly diagnosed hypertensive client shows correct understanding?",o:["\"I'll check my BP at home at the same time each day and keep a log to bring to my visits.\"","\"Once my headaches go away, I can stop worrying about my blood pressure.\"","\"Smoking a few cigarettes a day won't affect my heart.\"","\"Salt only matters for people with kidney disease.\""],a:0,r:"HTN is managed by tracking sustained readings over time. The other statements reflect misconceptions: HTN is silent, smoking raises SNS activity and clotting, and sodium raises volume."},
+{t:"A",q:"A 76-year-old woman with dyspnea and an S4 has an EDV of 100 mL and an ESV of 45 mL. What is her EF, and which type of HF does this suggest?",o:["55%, suggesting HFpEF (filling problem)","45%, suggesting HFrEF","55%, which rules out heart failure","30%, suggesting HFrEF"],a:0,r:"SV = 100 − 45 = 55 mL, and EF = 55/100 = 55%, which is preserved. With symptoms, an S4, and a stiff ventricle, this fits HFpEF. A normal EF does not exclude HF."},
+];
+
+
+/* ---------- Tabs ---------- */
+const tabs=document.querySelectorAll('#tabs button');
+function showTab(id){
+  tabs.forEach(b=>b.classList.toggle('active',b.dataset.tab===id));
+  document.querySelectorAll('section.panel').forEach(s=>s.classList.toggle('active',s.id===id));
+  history.replaceState(null,'','#'+id);
+  window.scrollTo({top:0});
+}
+tabs.forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+document.querySelectorAll('.ess-nav a').forEach(a=>a.addEventListener('click',e=>{
+  e.preventDefault();document.querySelector(a.getAttribute('href')).scrollIntoView({behavior:'smooth'});
+}));
+
+/* ---------- Flashcards ---------- */
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+let cat='All', order=TERMS.map((_,i)=>i);
+const cats=['All',...new Set(TERMS.map(t=>t[0]))];
+const chipBox=document.getElementById('catChips');
+cats.forEach(c=>{const b=document.createElement('button');b.className='chip'+(c==='All'?' active':'');b.textContent=c;
+  b.onclick=()=>{cat=c;chipBox.querySelectorAll('.chip').forEach(x=>x.classList.toggle('active',x===b));renderCards();};chipBox.appendChild(b);});
+function renderCards(){
+  const q=document.getElementById('search').value.trim().toLowerCase();
+  const grid=document.getElementById('cardGrid');grid.innerHTML='';let n=0;
+  order.forEach(i=>{const [c,term,def]=TERMS[i];
+    if(cat!=='All'&&c!==cat)return;
+    if(q&&!(term.toLowerCase().includes(q)||def.toLowerCase().includes(q)))return;
+    n++;
+    const d=document.createElement('div');d.className='flip';d.tabIndex=0;d.setAttribute('role','button');d.setAttribute('aria-label',term+', tap to flip');
+    d.innerHTML=`<div class="flip-inner"><div class="face front"><span class="cat">${esc(c)}</span><div class="term">${esc(term)}</div><span class="hint">tap to flip ↻</span></div><div class="face back"><div class="term">${esc(term)}</div><div>${esc(def)}</div></div></div>`;
+    const t=()=>d.classList.toggle('flipped');
+    d.addEventListener('click',t);d.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();t();}});
+    grid.appendChild(d);});
+  document.getElementById('termCount').textContent=`${n} card${n===1?'':'s'}`;
+}
+document.getElementById('search').addEventListener('input',renderCards);
+document.getElementById('shuffleBtn').onclick=()=>{for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]];}renderCards();};
+document.getElementById('resetFlip').onclick=()=>document.querySelectorAll('.flip.flipped').forEach(f=>f.classList.remove('flipped'));
+renderCards();
+
+/* ---------- Tests ---------- */
+const TAGS={C:'Comprehension',J:'Clinical Judgment',A:'Application'};
+function shuffleIdx(n){const a=[...Array(n).keys()];for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function buildTest(id,title,data){
+  const root=document.getElementById(id);
+  const state={answered:0,correct:0,byTag:{C:[0,0],J:[0,0],A:[0,0]}};
+  root.innerHTML=`<h2>${title}</h2>
+  <p class="lead">50 questions emphasizing comprehension, clinical decision-making, and application. Select your answer, then press <b>Check</b> to see the rationale. "Select all that apply" questions need every correct choice and no incorrect ones. Answer order is shuffled each time.</p>
+  <div class="legend"><span class="tag C">Comprehension</span><span class="tag J">Clinical Judgment</span><span class="tag A">Application</span><span class="tag S">Select All That Apply</span></div>
+  <div class="scorebar"><span class="stat">Answered <b class="ans">0</b>/${data.length}</span><span class="stat">Correct <b class="cor">0</b></span><span class="stat">Score <b class="pct">–</b></span><div class="progress"><div></div></div><button class="btn subtle reset">Restart</button></div>
+  <div class="qs"></div>
+  <div class="result"><div style="opacity:.8;font-size:14px;margin-bottom:6px">Your result</div><div class="big"></div><div class="breakdown"></div><button class="btn subtle reset2">Retake test</button></div>`;
+  const qs=root.querySelector('.qs');
+  data.forEach((item,qi)=>{
+    const multi=Array.isArray(item.a);
+    const correctSet=new Set(multi?item.a:[item.a]);
+    const ord=shuffleIdx(item.o.length);
+    const box=document.createElement('div');box.className='q';
+    box.innerHTML=`<div class="meta"><span class="qn">Q${qi+1}</span><span class="tag ${item.t}">${TAGS[item.t]}</span>${multi?'<span class="tag S">Select all that apply</span>':''}</div>
+      <p class="stem">${item.q}</p>
+      <div class="opts">${ord.map(oi=>`<label class="opt" data-oi="${oi}"><input type="${multi?'checkbox':'radio'}" name="${id}-q${qi}" value="${oi}"><span>${esc(item.o[oi])}</span><span class="mark"></span></label>`).join('')}</div>
+      <div class="actions"><button class="btn primary check" disabled>Check</button></div>
+      <div class="rationale"><strong></strong>${esc(item.r)}</div>`;
+    const btn=box.querySelector('.check');
+    box.querySelectorAll('input').forEach(inp=>inp.addEventListener('change',()=>{
+      box.querySelectorAll('.opt').forEach(l=>l.classList.toggle('sel',l.querySelector('input').checked));
+      btn.disabled=!box.querySelector('input:checked');
+    }));
+    btn.addEventListener('click',()=>{
+      const chosen=new Set([...box.querySelectorAll('input:checked')].map(i=>+i.value));
+      const ok=chosen.size===correctSet.size&&[...chosen].every(c=>correctSet.has(c));
+      box.querySelectorAll('.opt').forEach(l=>{
+        const oi=+l.dataset.oi;const inp=l.querySelector('input');inp.disabled=true;l.classList.remove('sel');
+        const m=l.querySelector('.mark');
+        if(correctSet.has(oi)&&chosen.has(oi)){l.classList.add('correct');m.textContent='✓ Correct';}
+        else if(!correctSet.has(oi)&&chosen.has(oi)){l.classList.add('wrong');m.textContent='✗';}
+        else if(correctSet.has(oi)){l.classList.add('missed');m.textContent=multi?'✓ Also correct':'✓ Answer';}
+      });
+      box.classList.add('done',ok?'right':'miss');
+      box.querySelector('.rationale strong').textContent=ok?'Correct!':'Not quite. Here\'s why:';
+      btn.remove();
+      state.answered++;if(ok)state.correct++;state.byTag[item.t][1]++;if(ok)state.byTag[item.t][0]++;
+      update();
+    });
+    qs.appendChild(box);
+  });
+  function update(){
+    root.querySelector('.ans').textContent=state.answered;
+    root.querySelector('.cor').textContent=state.correct;
+    root.querySelector('.pct').textContent=state.answered?Math.round(state.correct/state.answered*100)+'%':'–';
+    root.querySelector('.progress div').style.width=(state.answered/data.length*100)+'%';
+    if(state.answered===data.length){
+      const r=root.querySelector('.result');r.classList.add('show');
+      r.querySelector('.big').textContent=`${state.correct}/${data.length} · ${Math.round(state.correct/data.length*100)}%`;
+      r.querySelector('.breakdown').innerHTML=Object.entries(state.byTag).map(([k,[c,t]])=>`<span>${TAGS[k]}: <b>${c}/${t}</b></span>`).join('');
+      r.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+  }
+  const restart=()=>{buildTest(id,title,data);window.scrollTo({top:0});};
+  root.querySelector('.reset').onclick=()=>{if(confirm('Restart this test? Your answers will be cleared.'))restart();};
+  root.querySelector('.reset2').onclick=restart;
+}
+buildTest('t1','Practice Test 1',TEST1);
+buildTest('t2','Practice Test 2',TEST2);
+buildTest('t3','Practice Test 3: Case-Based',TEST3);
+
+const start=location.hash.slice(1);if(['terms','clinical','t1','t2','t3'].includes(start))showTab(start);
+</script>
+</body>
+</html>
